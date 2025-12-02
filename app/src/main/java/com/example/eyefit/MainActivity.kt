@@ -3,12 +3,13 @@ package com.example.eyefit // 패키지명 본인 것으로 수정
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.example.eyefit.ui.theme.EyeFitTheme
+import com.example.eyefit.navigation.AppNavGraph
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.eyefit.ui.theme.EyeFitTheme // 테마 이름 다르면 수정
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
