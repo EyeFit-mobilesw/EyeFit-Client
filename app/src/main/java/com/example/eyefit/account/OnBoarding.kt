@@ -1,6 +1,7 @@
 package com.example.eyefit
 
 import android.R.attr.fontWeight
+import android.R.attr.x
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,12 +14,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
+val pixelFont = FontFamily(Font(R.font.dnfbitbitv2))
 @Composable
 fun OnBoardingScreen(onTimeout: () -> Unit) {
     // 배경색 설정 (다크 모드 스타일)
@@ -53,6 +57,7 @@ fun OnBoardingScreen(onTimeout: () -> Unit) {
             Text(
                 text = "EyeFit",
                 fontSize = 50.sp,
+                fontFamily = pixelFont,
                 fontWeight = FontWeight.Bold,
                 style = TextStyle(
                     brush = textGradient // 그라데이션 적용
@@ -65,25 +70,25 @@ fun OnBoardingScreen(onTimeout: () -> Unit) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(300.dp) // 캐릭터 주변 공간 확보
             ) {
-//                // (1) 하늘색 구름 (왼쪽 위)
-//                Image(
-//                    painter = painterResource(id = R.drawable.img_cloud), // 구름 이미지 리소스 필요
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .size(60.dp)
-//                        .align(Alignment.TopStart) // 박스 기준 왼쪽 상단
-//                        .offset(x = 20.dp, y = 40.dp) // 위치 미세 조정
-//                )
-//
-//                // (2) 노란색 원/해 (오른쪽 위)
-//                Image(
-//                    painter = painterResource(id = R.drawable.img_sun), // 해 이미지 리소스 필요
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .size(50.dp)
-//                        .align(Alignment.TopEnd) // 박스 기준 오른쪽 상단
-//                        .offset(x = (-20).dp, y = 20.dp) // 위치 미세 조정
-//                )
+                // (1) 하늘색 구름 (왼쪽 위)
+                Image(
+                    painter = painterResource(id = R.drawable.img_cloud), // 구름 이미지 리소스 필요
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.TopStart) // 박스 기준 왼쪽 상단
+                        .offset(x = 10.dp, y = 40.dp) // 위치 미세 조정
+                )
+
+                // (2) 노란색 원/해 (오른쪽 위)
+                Image(
+                    painter = painterResource(id = R.drawable.img_sun), // 해 이미지 리소스 필요
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.TopEnd) // 박스 기준 오른쪽 상단
+                        .offset(x = (-20).dp, y = 20.dp) // 위치 미세 조정
+                )
 
                 // (3) 토마토 캐릭터 (중앙)
                 Image(
@@ -97,7 +102,11 @@ fun OnBoardingScreen(onTimeout: () -> Unit) {
          Image(
              painter = painterResource(id = R.drawable.img_cactus_decor),
              contentDescription = null,
-             modifier = Modifier.align(Alignment.BottomStart).padding(20.dp)
+             modifier = Modifier
+                 .align(Alignment.BottomStart) // 왼쪽 하단 정렬
+                 .width(200.dp) // 너비를 키워서 전체적으로 크게 만듦
+                 .height(200.dp)
+                 .offset(x = (-70).dp, y = 20.dp) // 왼쪽/아래로 살짝 밀어서 잘리는 느낌 연출
          )
     }
 }
