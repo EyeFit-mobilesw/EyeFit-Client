@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                 // 2. 네비게이션 그래프 설정 (시작점: onboarding)
                 NavHost(navController = navController, startDestination = "onboarding") {
 
-                    // [화면 1] 온보딩 스크린
+                    // 온보딩 스크린
                     composable("onboarding") {
                         OnBoardingScreen(
                             onTimeout = {
@@ -35,12 +35,12 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // [화면 2] 로그인 스크린
+                    // 로그인 스크린
                     composable("login") {
                         LoginScreen(navController = navController)
                     }
 
-                    // [화면 2] 회원가입 스크린
+                    // 회원가입 스크린
                     composable("signup") {
                         SignupScreen(navController)
                     }
@@ -52,19 +52,9 @@ class MainActivity : ComponentActivity() {
                         // 나중에 HomeScreen(navController)로 변경
                     }
 
-                    // [새로 추가할 경로]
+                    // 회원가입 완료 스크린
                     composable("signup_complete") {
-                        // 아직 페이지를 안 만들었다면 임시 텍스트 표시
-                        androidx.compose.foundation.layout.Box(
-                            modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-                            contentAlignment = androidx.compose.ui.Alignment.Center
-                        ) {
-                            androidx.compose.material3.Text(
-                                "가입 완료!",
-                                color = androidx.compose.ui.graphics.Color.White
-                            )
-                        }
-                        // 나중에 SignupCompleteScreen(navController) 로 교체
+                        SignupCompleteScreen(navController)
                     }
                 }
             }
