@@ -1,4 +1,4 @@
-package com.example.eyefit.ui.home
+package com.example.eyefit.home
 
 fun progressForDay(day: Int): Float {
     return when (day) {

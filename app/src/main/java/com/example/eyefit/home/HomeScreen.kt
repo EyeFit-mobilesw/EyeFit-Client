@@ -1,4 +1,4 @@
-package com.example.eyefit.ui.home
+package com.example.eyefit.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -14,13 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eyefit.R
-import com.example.eyefit.ui.components.CharacterWithBackground
-import com.example.eyefit.ui.components.DailyProgressBar
-import com.example.eyefit.ui.components.EyefitButton
+import com.example.eyefit.components.CharacterWithBackground
+import com.example.eyefit.components.DailyProgressBar
+import com.example.eyefit.components.EyefitButton
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.draw.alpha
 
 @Composable
 fun HomeScreen(

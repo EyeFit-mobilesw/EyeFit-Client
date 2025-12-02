@@ -1,4 +1,4 @@
-package com.example.eyefit.ui.home
+package com.example.eyefit.home
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

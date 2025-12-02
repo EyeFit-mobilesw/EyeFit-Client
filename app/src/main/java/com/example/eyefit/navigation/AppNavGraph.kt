@@ -5,17 +5,21 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.eyefit.ui.home.HomeScreen
-import com.example.eyefit.ui.exercise.ExerciseScreen
-import com.example.eyefit.ui.habit.DailyHabitCheckScreen
-import com.example.eyefit.ui.habit.EyeHabitScreen
+import com.example.eyefit.LoginScreen
+import com.example.eyefit.OnBoardingScreen
+import com.example.eyefit.SignupCompleteScreen
+import com.example.eyefit.SignupScreen
+import com.example.eyefit.home.HomeScreen
+import com.example.eyefit.exercise.ExerciseScreen
+import com.example.eyefit.habit.DailyHabitCheckScreen
+import com.example.eyefit.habit.EyeHabitScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController = rememberNavController()) {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "onboarding"
     ) {
         composable(route = "home") {
             HomeScreen(
@@ -43,7 +47,32 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
 
+        // 온보딩 스크린
+        composable("onboarding") {
+            OnBoardingScreen(
+                onTimeout = {
+                    // 3초 뒤 실행될 동작: 로그인 화면으로 이동
+                    navController.navigate("login") {
+                        // 중요: 뒤로가기 눌렀을 때 다시 온보딩이 나오지 않게 스택 제거
+                        popUpTo("onboarding") { inclusive = true }
+                    }
+                }
+            )
+        }
 
+        // 로그인 스크린
+        composable("login") {
+            LoginScreen(navController = navController)
+        }
 
+        // 회원가입 스크린
+        composable("signup") {
+            SignupScreen(navController)
+        }
+
+        // 회원가입 완료 스크린
+        composable("signup_complete") {
+            SignupCompleteScreen(navController)
+        }
     }
 }

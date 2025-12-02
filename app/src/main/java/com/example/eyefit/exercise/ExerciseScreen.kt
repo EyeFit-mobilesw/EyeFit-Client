@@ -1,4 +1,4 @@
-package com.example.eyefit.ui.exercise
+package com.example.eyefit.exercise
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
