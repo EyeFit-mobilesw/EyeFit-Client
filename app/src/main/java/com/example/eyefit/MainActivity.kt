@@ -40,9 +40,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("signup") {
-                        // Signup.kt를 아직 안 만들었다면 임시 텍스트 표시
-                        Text("회원가입 화면입니다", color = androidx.compose.ui.graphics.Color.White)
-                        // 나중에 SignupScreen(navController)로 변경
+                        SignupScreen(navController)
                     }
 
                     // [추가해야 할 부분]
