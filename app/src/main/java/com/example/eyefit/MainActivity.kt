@@ -3,6 +3,7 @@ package com.example.eyefit // 패키지명 본인 것으로 수정
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Text
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -35,7 +36,20 @@ class MainActivity : ComponentActivity() {
 
                     // [화면 2] 로그인 스크린
                     composable("login") {
-                        LoginScreen()
+                        LoginScreen(navController = navController)
+                    }
+
+                    composable("signup") {
+                        // Signup.kt를 아직 안 만들었다면 임시 텍스트 표시
+                        Text("회원가입 화면입니다", color = androidx.compose.ui.graphics.Color.White)
+                        // 나중에 SignupScreen(navController)로 변경
+                    }
+
+                    // [추가해야 할 부분]
+                    composable("home") {
+                        // Home.kt를 아직 안 만들었다면 임시 텍스트 표시
+                        Text("홈 화면입니다", color = androidx.compose.ui.graphics.Color.White)
+                        // 나중에 HomeScreen(navController)로 변경
                     }
                 }
             }

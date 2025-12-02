@@ -104,9 +104,9 @@ fun OnBoardingScreen(onTimeout: () -> Unit) {
              contentDescription = null,
              modifier = Modifier
                  .align(Alignment.BottomStart) // 왼쪽 하단 정렬
-                 .width(200.dp) // 너비를 키워서 전체적으로 크게 만듦
-                 .height(200.dp)
-                 .offset(x = (-70).dp, y = 20.dp) // 왼쪽/아래로 살짝 밀어서 잘리는 느낌 연출
+                 .width(300.dp) // 너비를 키워서 전체적으로 크게 만듦
+                 .height(300.dp)
+                 .offset(x = (-80).dp, y = 50.dp) // 왼쪽/아래로 살짝 밀어서 잘리는 느낌 연출
          )
     }
 }
