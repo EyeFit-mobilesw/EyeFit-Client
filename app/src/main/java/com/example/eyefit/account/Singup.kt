@@ -81,8 +81,7 @@ fun SignupScreen(navController: NavController) {
             SignupTextField(
                 value = emailText,
                 onValueChange = { emailText = it },
-                borderColor = mainColor,
-                placeholder = "ex) mobilesoftware@sookmyung.ac.kr"
+                borderColor = mainColor
             )
             Spacer(modifier = Modifier.height(25.dp))
 
