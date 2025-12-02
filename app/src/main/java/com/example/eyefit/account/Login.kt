@@ -1,8 +1,5 @@
 package com.example.eyefit
 
-import android.R.attr.bottom
-import android.R.attr.fontFamily
-import android.R.attr.fontWeight
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,25 +25,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import com.example.eyefit.pixelFont
+// import com.example.eyefit.pixelFont // 패키지 구조에 따라 import 필요 여부가 다를 수 있음
 
 @Composable
 fun LoginScreen(navController: NavController) {
     // 색상 정의
     val backgroundColor = Color(0xFF222222)
     val mainColor = Color(0xFF2CCEF3) // 버튼 및 테두리 하늘색
+    val disabledColor = Color.Gray    // 비활성화 색상
 
-    // 텍스트 그라데이션 브러시 (하늘색 -> 흰색)
+    // 텍스트 그라데이션 브러시
     val textGradient = Brush.horizontalGradient(
         colors = listOf(
-            Color(0xFFF7F8F9), //
-            Color(0xFFC3F4FF)  //
+            Color(0xFFF7F8F9),
+            Color(0xFFC3F4FF)
         )
     )
 
     // 입력값 상태 관리
     var idText by remember { mutableStateOf("") }
     var passwordText by remember { mutableStateOf("") }
+
+    // [추가됨] 두 필드가 모두 채워졌는지 확인 (공백 제외하려면 isNotBlank 사용)
+    val isLoginValid = idText.isNotEmpty() && passwordText.isNotEmpty()
 
     Box(
         modifier = Modifier
@@ -56,25 +57,25 @@ fun LoginScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 40.dp) // 좌우 여백
-                .align(Alignment.Center), // 화면 중앙 정렬
+                .padding(horizontal = 40.dp)
+                .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // 1. 로고
             Text(
                 text = "EyeFit",
                 fontSize = 50.sp,
-                fontFamily = pixelFont, // OnBoarding에 있는 폰트 변수 사용 (또는 여기서 재선언)
+                fontFamily = pixelFont,
                 fontWeight = FontWeight.Bold,
                 style = TextStyle(
-                    brush = textGradient // 그라데이션 적용
+                    brush = textGradient
                 ),
                 modifier = Modifier.padding(bottom = 20.dp)
             )
 
-            // 2. 아이디 입력 섹션 (토마토 + 라벨 + 입력창)
+            // 2. 아이디 입력 섹션
             Box(modifier = Modifier.fillMaxWidth()) {
-                // 라벨 (왼쪽 아래)
+                // 라벨
                 Text(
                     text = "아이디",
                     color = Color.White,
@@ -83,15 +84,15 @@ fun LoginScreen(navController: NavController) {
                     modifier = Modifier.align(Alignment.BottomStart).padding(bottom = 8.dp)
                 )
 
-                // 토마토 캐릭터 (오른쪽 아래) - 입력창 바로 위에 위치
+                // [수정됨] 토마토 캐릭터 이미지 변경 (running_tomato -> left_tomato)
                 Image(
-                    painter = painterResource(id = R.drawable.running_tomato), // 토마토 이미지
+                    painter = painterResource(id = R.drawable.left_tomato),
                     contentDescription = null,
                     modifier = Modifier
                         .size(60.dp)
                         .align(Alignment.BottomEnd)
-                        .offset(y = 10.dp) // 살짝 아래로 내려서 입력창에 걸터앉은 느낌
-                        .zIndex(1f) // 입력창보다 위에 그려지도록 설정
+                        .offset(y = 10.dp)
+                        .zIndex(1f)
                 )
             }
 
@@ -126,17 +127,21 @@ fun LoginScreen(navController: NavController) {
             // 4. 로그인 버튼
             Button(
                 onClick = {
-                    // 홈 화면으로 이동하며 백스택 정리 (뒤로가기 시 로그인화면 안 나오게)
                     navController.navigate("home") {
                         popUpTo("login") { inclusive = true }
                     }
                 },
+                // [수정됨] 유효성 검사 결과에 따라 활성/비활성
+                enabled = isLoginValid,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = mainColor // 하늘색 배경
+                    containerColor = mainColor, // 활성 상태 배경
+                    disabledContainerColor = disabledColor, // 비활성 상태 배경
+                    contentColor = Color.White,
+                    disabledContentColor = Color.White
                 )
             ) {
                 Text(
@@ -160,27 +165,27 @@ fun LoginScreen(navController: NavController) {
                     text = "회원가입",
                     color = Color.White,
                     fontSize = 14.sp,
-                    textDecoration = TextDecoration.Underline, // 밑줄
+                    textDecoration = TextDecoration.Underline,
                     modifier = Modifier.clickable {
-                        navController.navigate("signup") // 회원가입 화면으로 이동
+                        navController.navigate("signup")
                     }
                 )
             }
         }
 
-        // 6. 하단 선인장 장식 (우측 하단)
+        // 6. 하단 선인장 장식
         Image(
             painter = painterResource(id = R.drawable.img_cactus_decor),
             contentDescription = null,
             modifier = Modifier
-                .align(Alignment.BottomEnd) // 오른쪽 아래 정렬
-                .size(300.dp) // 크기 조절
-                .offset(x = 50.dp, y = 50.dp) // 구석으로 밀어넣기
+                .align(Alignment.BottomEnd)
+                .size(300.dp)
+                .offset(x = 50.dp, y = 50.dp)
         )
     }
 }
 
-// 디자인 요구사항에 맞춘 커스텀 텍스트 필드
+// CustomTextField는 변경사항이 없어 그대로 사용하시면 됩니다.
 @Composable
 fun CustomTextField(
     value: String,
@@ -197,10 +202,10 @@ fun CustomTextField(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(55.dp) // 높이 고정
-                    .background(Color.White, RoundedCornerShape(12.dp)) // 흰색 배경 + 둥근 모서리
-                    .border(3.dp, borderColor, RoundedCornerShape(12.dp)) // 하늘색 테두리
-                    .padding(horizontal = 16.dp), // 내부 글자 여백
+                    .height(55.dp)
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .border(3.dp, borderColor, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 innerTextField()

@@ -3,7 +3,6 @@ package com.example.eyefit
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -31,6 +30,7 @@ fun SignupScreen(navController: NavController) {
     // 색상 정의
     val backgroundColor = Color(0xFF222222)
     val mainColor = Color(0xFF5CC1F0) // 하늘색
+    val disabledColor = Color.Gray // 비활성화 버튼 색상
 
     // 입력값 상태 관리
     var emailText by remember { mutableStateOf("") }
@@ -38,25 +38,33 @@ fun SignupScreen(navController: NavController) {
     var passwordText by remember { mutableStateOf("") }
     var passwordCheckText by remember { mutableStateOf("") }
 
+    // [추가됨] 모든 필드가 채워졌는지 확인하는 변수
+    // isNotEmpty()는 빈 문자열이 아닐 때 true를 반환합니다.
+    // 공백(스페이스바)도 입력으로 치지 않으려면 isNotBlank()를 사용하세요.
+    val isFormValid = emailText.isNotEmpty() &&
+            idText.isNotEmpty() &&
+            passwordText.isNotEmpty() &&
+            passwordCheckText.isNotEmpty()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
     ) {
-        // 1. 메인 콘텐츠 (스크롤이 필요하다면 Column을 verticalScroll로 감싸세요)
+        // 1. 메인 콘텐츠
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 40.dp, vertical = 30.dp)
         ) {
-            // --- 상단 바 (뒤로가기 + 타이틀) ---
+            // --- 상단 바 ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 50.dp)
             ) {
                 IconButton(
-                    onClick = { navController.popBackStack() }, // 뒤로가기
+                    onClick = { navController.popBackStack() },
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
                     Icon(
@@ -118,41 +126,45 @@ fun SignupScreen(navController: NavController) {
             // --- 회원가입 버튼 ---
             Button(
                 onClick = {
-                    // 가입 완료 화면으로 이동
                     navController.navigate("signup_complete")
                 },
+                // [수정됨] 유효성 검사 결과에 따라 버튼 활성/비활성 결정
+                enabled = isFormValid,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = mainColor
+                    containerColor = mainColor, // 활성 상태일 때 배경색
+                    disabledContainerColor = disabledColor, // [추가됨] 비활성 상태일 때 배경색 (회색)
+                    contentColor = Color.White,
+                    disabledContentColor = Color.White
                 )
             ) {
                 Text(
                     text = "회원가입",
-                    color = Color.White,
+                    color = Color.White, // 텍스트 색상
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
         }
 
-        // 2. 하단 선인장 장식 (화면 제일 아래, 뒤에 깔리도록 Box의 마지막에 배치하거나 zIndex 고려)
-        // 입력창을 가리지 않게 하기 위해 이번에는 배경처럼 맨 밑에 깔고 싶다면 Column 위로 올리거나,
-        // UI 구조상 겹쳐도 되면 여기에 둡니다. (사진상 버튼 뒤에 있음)
+        // 2. 하단 선인장 장식
         Image(
             painter = painterResource(id = R.drawable.img_cactus_decor),
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .size(300.dp)
-                .offset(x = 50.dp, y = 50.dp) // 위치 미세 조정
+                .offset(x = 50.dp, y = 50.dp)
         )
     }
 }
 
-// 라벨 텍스트 컴포넌트
+// (아래 LabelText, SignupTextField 컴포넌트는 기존과 동일하므로 생략 가능하지만,
+// 복사 붙여넣기 편의를 위해 그대로 둡니다.)
+
 @Composable
 fun LabelText(text: String) {
     Text(
@@ -164,7 +176,6 @@ fun LabelText(text: String) {
     )
 }
 
-// 회원가입용 텍스트 필드 (Placeholder 기능 추가)
 @Composable
 fun SignupTextField(
     value: String,
@@ -188,7 +199,6 @@ fun SignupTextField(
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
-                // Placeholder 표시 로직
                 if (value.isEmpty() && placeholder != null) {
                     Text(
                         text = placeholder,
