@@ -19,24 +19,26 @@ import androidx.compose.ui.unit.sp
 import com.example.eyefit.R
 import kotlinx.coroutines.delay
 
-
 @Composable
 fun DailyHabitCheckScreen(
     onBack: () -> Unit = {}
 ) {
-    var habitStates by remember {
+    // 실제 저장된 값 (첫 방문에는 all false)
+    var originalHabitStates by remember {
         mutableStateOf(
-            listOf(
-                false,   // 스마트폰 장시간 사용 X
-                false,   // 충분한 수면
-                false,  // 흡연 X
-                false,  // 인공눈물
-                false,   // 눈 찜질
-                false   // 렌즈 장시간 사용 X
-            )
+            listOf(false, false, false, false, false, false)
         )
     }
 
+    // 현재 선택 값
+    var habitStates by remember {
+        mutableStateOf(originalHabitStates)
+    }
+
+    // 수정모드 여부
+    var isEditing by remember { mutableStateOf(true) }
+
+    // 체크완료 팝업
     var showCompletePopup by remember { mutableStateOf(false) }
 
     Column(
@@ -49,10 +51,8 @@ fun DailyHabitCheckScreen(
         Spacer(modifier = Modifier.height(39.dp))
 
         /** ---------------------------
-         *   상단 UI
-         *   뒤로가기 + 제목 중앙정렬
+         *   상단 (뒤로가기 + 제목)
         ----------------------------- */
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,7 +69,6 @@ fun DailyHabitCheckScreen(
                     .clickable { onBack() }
             )
 
-            // 제목 중앙 정렬
             Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
@@ -81,18 +80,21 @@ fun DailyHabitCheckScreen(
                 )
             }
 
-            // 오른쪽 공간 균형용 더미
             Spacer(modifier = Modifier.size(28.dp))
         }
 
         Spacer(modifier = Modifier.height(33.dp))
 
+
         /** ---------------------------
          *   수정 버튼
         ----------------------------- */
-
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isEditing = true // 수정 모드 활성화
+                },
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -107,18 +109,19 @@ fun DailyHabitCheckScreen(
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "수정",
-                color = Color.Gray,
-                fontSize = 14.sp
+                text = if (isEditing) "수정중" else "수정",
+                color = if (isEditing) Color.Black else Color.Gray,
+                fontSize = 14.sp,
+                fontWeight = if (isEditing) FontWeight.Bold else FontWeight.Normal
             )
         }
 
         Spacer(modifier = Modifier.height(17.dp))
 
+
         /** ---------------------------
          *   습관 리스트
         ----------------------------- */
-
         val habits = listOf(
             Pair(R.drawable.ic_phone, "스마트폰을 장시간 이용하지 않았다"),
             Pair(R.drawable.ic_sleep, "충분한 수면을 취했다"),
@@ -134,9 +137,12 @@ fun DailyHabitCheckScreen(
                 icon = item.first,
                 text = item.second,
                 selected = habitStates[index],
+                enabled = isEditing,
                 onClick = {
-                    habitStates = habitStates.toMutableList().apply {
-                        this[index] = !this[index]
+                    if (isEditing) {
+                        habitStates = habitStates.toMutableList().apply {
+                            this[index] = !this[index]
+                        }
                     }
                 }
             )
@@ -144,25 +150,38 @@ fun DailyHabitCheckScreen(
             Spacer(modifier = Modifier.height(17.dp))
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(110.dp))
+
 
         /** ---------------------------
          *   체크완료 버튼
         ----------------------------- */
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp)
+                .height(65.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(Color(0xFF74D6FF))
-                .clickable { showCompletePopup = true },
+                .background(Color(0xFF2CCEF3))
+                .clickable {
+
+                    // 변경 여부 체크
+                    val changed = habitStates != originalHabitStates
+
+                    if (changed) {
+                        // 저장
+                        originalHabitStates = habitStates
+                        showCompletePopup = true
+                    }
+
+                    // 저장 후 수정 종료
+                    isEditing = false
+                },
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "체크완료",
                 color = Color.White,
-                fontSize = 18.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -171,15 +190,12 @@ fun DailyHabitCheckScreen(
     }
 
     /** ---------------------------
-     *   팝업 표시 + 자동 사라짐
+     *   팝업 + 자동 종료
     ----------------------------- */
     if (showCompletePopup) {
 
-        CompletePopup(
-            onDismiss = { showCompletePopup = false }
-        )
+        CompletePopup(onDismiss = { showCompletePopup = false })
 
-        // 2초 뒤 자동 dismiss
         LaunchedEffect(Unit) {
             delay(2000)
             showCompletePopup = false
@@ -188,57 +204,69 @@ fun DailyHabitCheckScreen(
 }
 
 
-/* -----------------------------------------------------
-   습관 박스 (두껍게 수정됨)
------------------------------------------------------- */
 
+/* -----------------------------------------------------
+   습관 박스 (아이콘 정사각형 스타일)
+------------------------------------------------------ */
 @Composable
 fun HabitItem(
     icon: Int,
     text: String,
     selected: Boolean,
+    enabled: Boolean,
     onClick: () -> Unit
 ) {
+    val yellowMain = Color(0xFFFEE712)
+    val yellowSoft = Color(0xFFFFF383)
+    val grayIconBg = Color(0xFFF7F8F9)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(72.dp)              // ← 박스 더 두꺼움
-            .clip(RoundedCornerShape(14.dp))
-            .background(
-                if (selected) Color(0xFFFFF4A8)
-                else Color.White
-            )
-            .clickable { onClick() },
+            .height(65.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(if (selected) yellowSoft else Color.White)
+            .clickable(enabled = enabled) { onClick() },
         contentAlignment = Alignment.CenterStart
     ) {
 
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = icon),
-                contentDescription = null,
-                modifier = Modifier.size(32.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(41.dp)
+                    .background(
+                        if (selected) yellowMain else grayIconBg,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             Text(
                 text = text,
-                fontSize = 16.sp,
-                color = if (selected) Color.Black else Color(0xFF707070),
-                fontWeight = FontWeight.Medium
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = if (selected) Color.Black else Color(0xFF8A8A8A)
             )
         }
     }
 }
 
 
-/* -----------------------------------------------------
-   체크완료 팝업 (버튼 위에 표시 + 자동 사라짐)
------------------------------------------------------- */
 
+/* -----------------------------------------------------
+   완료 팝업
+------------------------------------------------------ */
 @Composable
 fun CompletePopup(
     onDismiss: () -> Unit
@@ -253,7 +281,7 @@ fun CompletePopup(
 
         Row(
             modifier = Modifier
-                .padding(bottom = 110.dp)    // 체크완료 버튼 바로 위
+                .padding(bottom = 180.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .background(Color.Black)
                 .padding(horizontal = 20.dp, vertical = 14.dp),
@@ -267,13 +295,13 @@ fun CompletePopup(
                 modifier = Modifier.size(20.dp)
             )
 
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(6.dp))
 
             Text(
                 text = "오늘의 눈 건강 습관 체크완료!",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 15.sp
+                fontSize = 13.sp
             )
         }
     }
