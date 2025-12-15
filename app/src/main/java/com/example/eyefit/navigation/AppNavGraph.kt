@@ -67,13 +67,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
 
         composable("habit_analysis") {
             HabitAnalysisScreen(
-                onBack = { navController.popBackStack() },
-                weeklyHabitCounts = listOf(1,6,4,2,1,4,6),     // 예시 데이터
-                todayUncheckedHabits = listOf(
-                    "콘택트 렌즈를 장시간 사용 않기",
-                    "충분한 수면을 취하기",
-                    "눈 찜질을 하루 1회 하자"
-                )
+                onBack = { navController.popBackStack() }
             )
         }
 

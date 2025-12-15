@@ -1,5 +1,7 @@
 package com.example.eyefit.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,7 +22,12 @@ import com.example.eyefit.components.EyefitButton
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.DisposableEffect
+import com.example.eyefit.data.firebase.FirebaseProvider
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     onStartExercise: () -> Unit,
@@ -29,6 +36,36 @@ fun HomeScreen(
 ) {
 
     val day by viewModel.currentDay.collectAsState()
+    // ✅ 오늘 습관 달성 개수 (Firestore에서 items true 개수)
+    val db = remember { FirebaseProvider.db }
+    val uid = FirebaseProvider.auth.currentUser?.uid
+
+    val todayKey = remember {
+        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    }
+
+    var todayAchievedCount by remember { mutableStateOf(0) }
+
+    // ✅ 오늘 문서 실시간 반영: users/{uid}/habitChecks/{todayKey}
+    DisposableEffect(uid, todayKey) {
+        if (uid == null) {
+            todayAchievedCount = 0
+            onDispose { }
+        } else {
+            val reg = db.collection("users")
+                .document(uid)
+                .collection("habitChecks")
+                .document(todayKey)
+                .addSnapshotListener { snap, _ ->
+                    val items = snap?.get("items") as? Map<*, *>
+                    val count = items?.values?.count { it == true } ?: 0
+                    todayAchievedCount = count
+                }
+
+            onDispose { reg.remove() }
+        }
+    }
+
 
     // Day 배경
     val backgroundRes = when (day) {
@@ -203,7 +240,7 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         Text(
-                            text = "6개 달성 완료!",
+                            text = "${todayAchievedCount}개 달성 완료!",
                             color = Color(0xFF8D8D8D),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold
