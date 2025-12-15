@@ -1,4 +1,4 @@
-package com.example.eyefit.ui.components
+package com.example.eyefit.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

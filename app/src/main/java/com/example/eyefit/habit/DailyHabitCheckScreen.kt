@@ -1,4 +1,4 @@
-package com.example.eyefit.ui.habit
+package com.example.eyefit.habit
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
