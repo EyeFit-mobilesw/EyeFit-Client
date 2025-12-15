@@ -13,6 +13,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,18 +24,33 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.eyefit.R
-import com.example.eyefit.data.model.exerciseList
+// import com.example.eyefit.data.model.exerciseList // 더 이상 사용하지 않음
 
 @Composable
 fun ExerciseDetailScreen(
     navController: NavController,
-    exerciseId: Int // 네비게이션으로 전달받은 ID
+    exerciseId: Int, // 네비게이션 인자
+    viewModel: ExerciseDetailViewModel = viewModel() // 뷰모델 주입
 ) {
-    // ID로 해당 운동 데이터 찾기 (없으면 첫 번째 데이터 보여줌)
-    val data = exerciseList.find { it.id == exerciseId }
-        ?: exerciseList[0]
+    // 1. 화면 진입 시 데이터 로드 요청
+    LaunchedEffect(exerciseId) {
+        viewModel.loadExercise(exerciseId.toLong())
+    }
+
+    // 2. 데이터 관찰
+    val uiState by viewModel.exerciseState.collectAsState()
+
+    // 데이터가 로드되기 전(null)이면 빈 화면이나 로딩바 표시
+    if (uiState == null) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.White))
+        return
+    }
+
+    // 데이터가 로드되면 data 변수에 할당 (null이 아님을 보장)
+    val data = uiState!!
 
     val mainBlue = Color(0xFF5CC1F0)
     val badgeYellow = Color(0xFFFFF383)
@@ -42,18 +60,16 @@ fun ExerciseDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .verticalScroll(rememberScrollState()) // 세로 스크롤 가능하게
+            .verticalScroll(rememberScrollState())
     ) {
         // --- 1. 상단바 (뒤로가기) ---
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
-            // [추가됨] 뒤로가기 버튼 (디자인 좌측 상단 화살표)
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_back),
                 contentDescription = null,
-                tint = Color.Black,
+                tint = Color(color = 0xFF222222),
                 modifier = Modifier
                     .padding(start = 21.dp, top = 70.dp)
                     .size(28.dp)
@@ -88,23 +104,20 @@ fun ExerciseDetailScreen(
                     )
                 }
 
-                // 시간 배지 (노란색)
-                // 시간 배지 (노란색)
+                // 시간 배지 (노란색) - 테두리 문제 수정 적용됨
                 Box(
                     modifier = Modifier
-                        // 1. 테두리를 먼저 그리거나 (배경과 같은 크기)
                         .border(
                             width = 0.8.dp,
                             color = Color(0xFF8D8D8D),
                             shape = RoundedCornerShape(20.dp)
                         )
-                        // 2. 배경을 설정하고
                         .background(badgeYellow, RoundedCornerShape(20.dp))
-                        // 3. 마지막에 내용물(Text)과의 간격을 둡니다.
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = data.time,
+                        // [수정] data.time -> data.timeString
+                        text = data.timeString,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
@@ -118,7 +131,7 @@ fun ExerciseDetailScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp), // 적절한 높이 설정
+                    .height(200.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -131,9 +144,9 @@ fun ExerciseDetailScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // --- 4. 효과 버튼 (장식용) ---
+            // --- 4. 효과 버튼 ---
             Button(
-                onClick = { /* 효과 팝업 등 기능이 있다면 추가 */ },
+                onClick = { /* 효과 팝업 등 */ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
@@ -152,17 +165,19 @@ fun ExerciseDetailScreen(
 
             // --- 5. 설명 섹션 (동적 데이터) ---
             Text(
+                // [수정] 모델에 추가한 필드 사용
                 text = data.descriptionTitle,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(color = 0xFF222222)
+                color = Color(0xFF222222)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
+                // [수정] 모델에 추가한 필드 사용
                 text = data.descriptionContent,
                 fontSize = 15.sp,
                 color = grayText,
-                lineHeight = 24.sp // 줄간격 넉넉하게
+                lineHeight = 24.sp
             )
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -182,7 +197,7 @@ fun ExerciseDetailScreen(
                 lineHeight = 24.sp
             )
 
-            Spacer(modifier = Modifier.height(50.dp)) // 하단 여백
+            Spacer(modifier = Modifier.height(50.dp))
         }
     }
 }
