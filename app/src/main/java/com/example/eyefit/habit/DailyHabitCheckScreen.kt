@@ -18,28 +18,96 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.eyefit.R
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import com.example.eyefit.data.firebase.FirebaseProvider
+import com.google.firebase.firestore.SetOptions
 
 @Composable
 fun DailyHabitCheckScreen(
     onBack: () -> Unit = {}
 ) {
-    // 실제 저장된 값 (첫 방문에는 all false)
-    var originalHabitStates by remember {
-        mutableStateOf(
-            listOf(false, false, false, false, false, false)
+    // Firebase
+    val auth = remember { FirebaseProvider.auth }
+    val db = remember { FirebaseProvider.db }
+    val scope = rememberCoroutineScope()
+
+    val uid = auth.currentUser?.uid
+    val dateKey = remember {
+        SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(Date())
+    }
+
+    // ✅ Firestore에 저장할 습관 key (index 순서와 1:1 매칭)
+    val habitKeys = remember {
+        listOf(
+            "SMARTPHONE_LIMIT",
+            "SLEEP_ENOUGH",
+            "NO_SMOKING",
+            "USE_ARTIFICIAL_TEARS",
+            "EYE_STEAM",
+            "CONTACT_LENS_LIMIT"
         )
     }
 
+    // 실제 저장된 값 (초기: all false)
+    var originalHabitStates by remember { mutableStateOf(List(6) { false }) }
+
     // 현재 선택 값
-    var habitStates by remember {
-        mutableStateOf(originalHabitStates)
-    }
+    var habitStates by remember { mutableStateOf(originalHabitStates) }
 
     // 수정모드 여부
     var isEditing by remember { mutableStateOf(true) }
 
     // 체크완료 팝업
     var showCompletePopup by remember { mutableStateOf(false) }
+
+    // 로딩/에러
+    var loading by remember { mutableStateOf(false) }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
+    var didLoadOnce by remember { mutableStateOf(false) }
+
+    /** ---------------------------
+     *  ✅ 화면 진입 시: 오늘 기록 Firestore에서 불러오기
+     *  users/{uid}/habitChecks/{dateKey}
+    ----------------------------- */
+    LaunchedEffect(uid) {
+        if (uid == null) return@LaunchedEffect
+        if (didLoadOnce) return@LaunchedEffect
+
+        loading = true
+        errorMsg = null
+        try {
+            val doc = db.collection("users")
+                .document(uid)
+                .collection("habitChecks")
+                .document(dateKey)
+                .get()
+                .await()
+
+            if (doc.exists()) {
+                val items = doc.get("items") as? Map<*, *>
+
+                val loaded = habitKeys.map { key ->
+                    (items?.get(key) as? Boolean) ?: false
+                }
+
+                originalHabitStates = loaded
+                habitStates = loaded
+            } else {
+                // 오늘 문서가 아직 없으면 all false 유지
+                originalHabitStates = List(6) { false }
+                habitStates = originalHabitStates
+            }
+        } catch (e: Exception) {
+            errorMsg = e.message ?: "오늘 습관 기록을 불러오지 못했어요."
+        } finally {
+            loading = false
+            didLoadOnce = true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -85,16 +153,13 @@ fun DailyHabitCheckScreen(
 
         Spacer(modifier = Modifier.height(33.dp))
 
-
         /** ---------------------------
          *   수정 버튼
         ----------------------------- */
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {
-                    isEditing = true // 수정 모드 활성화
-                },
+                .clickable { isEditing = true },
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -118,7 +183,6 @@ fun DailyHabitCheckScreen(
 
         Spacer(modifier = Modifier.height(17.dp))
 
-
         /** ---------------------------
          *   습관 리스트
         ----------------------------- */
@@ -137,9 +201,9 @@ fun DailyHabitCheckScreen(
                 icon = item.first,
                 text = item.second,
                 selected = habitStates[index],
-                enabled = isEditing,
+                enabled = isEditing && !loading,
                 onClick = {
-                    if (isEditing) {
+                    if (isEditing && !loading) {
                         habitStates = habitStates.toMutableList().apply {
                             this[index] = !this[index]
                         }
@@ -150,11 +214,20 @@ fun DailyHabitCheckScreen(
             Spacer(modifier = Modifier.height(17.dp))
         }
 
+        // 에러 메시지
+        if (errorMsg != null) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = errorMsg!!,
+                color = Color.Red,
+                fontSize = 12.sp
+            )
+        }
+
         Spacer(modifier = Modifier.height(110.dp))
 
-
         /** ---------------------------
-         *   체크완료 버튼
+         *   ✅ 체크완료 버튼 (Firestore 저장)
         ----------------------------- */
         Box(
             modifier = Modifier
@@ -162,24 +235,62 @@ fun DailyHabitCheckScreen(
                 .height(65.dp)
                 .clip(RoundedCornerShape(14.dp))
                 .background(Color(0xFF2CCEF3))
-                .clickable {
+                .clickable(enabled = !loading) {
 
                     // 변경 여부 체크
                     val changed = habitStates != originalHabitStates
-
-                    if (changed) {
-                        // 저장
-                        originalHabitStates = habitStates
-                        showCompletePopup = true
+                    if (!changed) {
+                        isEditing = false
+                        return@clickable
                     }
 
-                    // 저장 후 수정 종료
-                    isEditing = false
+                    // 로그인 체크
+                    if (uid == null) {
+                        errorMsg = "로그인 상태가 아니어서 저장할 수 없어요."
+                        return@clickable
+                    }
+
+                    scope.launch {
+                        loading = true
+                        errorMsg = null
+
+                        try {
+                            // ✅ Firestore 저장 데이터
+                            val itemsMap: Map<String, Boolean> =
+                                habitKeys.mapIndexed { idx, key -> key to habitStates[idx] }.toMap()
+
+                            val achievedCount = habitStates.count { it } // ✅ 그래프용
+
+                            val data = mapOf(
+                                "dateKey" to dateKey,
+                                "items" to itemsMap,
+                                "achievedCount" to achievedCount,
+                                "updatedAt" to System.currentTimeMillis()
+                            )
+
+                            db.collection("users")
+                                .document(uid)
+                                .collection("habitChecks")
+                                .document(dateKey)
+                                .set(data, SetOptions.merge())
+                                .await()
+
+                            // 저장 성공 → 로컬 기준값 갱신 + 팝업
+                            originalHabitStates = habitStates
+                            showCompletePopup = true
+                            isEditing = false
+
+                        } catch (e: Exception) {
+                            errorMsg = e.message ?: "저장에 실패했어요."
+                        } finally {
+                            loading = false
+                        }
+                    }
                 },
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "체크완료",
+                text = if (loading) "저장중..." else "체크완료",
                 color = Color.White,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -193,17 +304,14 @@ fun DailyHabitCheckScreen(
      *   팝업 + 자동 종료
     ----------------------------- */
     if (showCompletePopup) {
-
         CompletePopup(onDismiss = { showCompletePopup = false })
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(showCompletePopup) {
             delay(2000)
             showCompletePopup = false
         }
     }
 }
-
-
 
 /* -----------------------------------------------------
    습관 박스 (아이콘 정사각형 스타일)
@@ -261,8 +369,6 @@ fun HabitItem(
         }
     }
 }
-
-
 
 /* -----------------------------------------------------
    완료 팝업
