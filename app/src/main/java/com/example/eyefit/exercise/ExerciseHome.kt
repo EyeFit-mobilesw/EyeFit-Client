@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.eyefit.components.ExerciseCardItem
-import com.example.eyefit.model.exerciseList
+import com.example.eyefit.data.model.exerciseList
 
 // [데이터 모델]
 data class ExerciseData(
