@@ -1,5 +1,7 @@
 package com.example.eyefit.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -23,6 +25,7 @@ import com.example.eyefit.habit.DailyHabitCheckScreen
 import com.example.eyefit.habit.EyeHabitScreen
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(navController: NavHostController = rememberNavController()) {
 
