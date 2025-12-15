@@ -137,7 +137,7 @@ fun HomeScreen(
 
             EyefitButton(
                 text = "눈 운동 시작하기",
-                onClick = onStartExercise,
+                onClick = { onStartExercise() },
                 fontSize = 20,
                 fontWeight = FontWeight.SemiBold,
                 eyeSize = 33

@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -25,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.eyefit.R
-import com.example.eyefit.model.ExerciseData
+import com.example.eyefit.data.model.exerciseList
 
 @Composable
 fun ExerciseDetailScreen(
@@ -33,8 +31,8 @@ fun ExerciseDetailScreen(
     exerciseId: Int // 네비게이션으로 전달받은 ID
 ) {
     // ID로 해당 운동 데이터 찾기 (없으면 첫 번째 데이터 보여줌)
-    val data = com.example.eyefit.model.exerciseList.find { it.id == exerciseId }
-        ?: com.example.eyefit.model.exerciseList[0]
+    val data = exerciseList.find { it.id == exerciseId }
+        ?: exerciseList[0]
 
     val mainBlue = Color(0xFF5CC1F0)
     val badgeYellow = Color(0xFFFFF383)

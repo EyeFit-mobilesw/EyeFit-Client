@@ -1,4 +1,4 @@
-package com.example.eyefit.model
+package com.example.eyefit.data.model
 
 import com.example.eyefit.R
 

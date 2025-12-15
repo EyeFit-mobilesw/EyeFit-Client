@@ -25,9 +25,22 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.eyefit.data.firebase.FirebaseProvider
+import com.example.eyefit.data.model.UserProfile
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+
 
 @Composable
 fun SignupScreen(navController: NavController) {
+
+    val auth = remember { FirebaseProvider.auth }
+    val db = remember { FirebaseProvider.db }
+    val scope = rememberCoroutineScope()
+
+    var errorMsg by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(false) }
+
     // 색상 정의
     val backgroundColor = Color(0xFF222222)
     val mainColor = Color(0xFF5CC1F0) // 하늘색
@@ -45,7 +58,8 @@ fun SignupScreen(navController: NavController) {
     val isFormValid = emailText.isNotEmpty() &&
             idText.isNotEmpty() &&
             passwordText.isNotEmpty() &&
-            passwordCheckText.isNotEmpty()
+            passwordCheckText.isNotEmpty() &&
+            passwordText == passwordCheckText
 
     Box(
         modifier = Modifier
@@ -127,10 +141,50 @@ fun SignupScreen(navController: NavController) {
             // --- 회원가입 버튼 ---
             Button(
                 onClick = {
-                    navController.navigate("signup_complete")
+                    scope.launch {
+                        loading = true
+                        errorMsg = null
+
+                        try {
+                            // 0) username(아이디) 중복 체크 (Firestore)
+                            val duplicated = db.collection("users")
+                                .whereEqualTo("username", idText)
+                                .limit(1)
+                                .get()
+                                .await()
+                                .isEmpty.not()
+
+                            if (duplicated) {
+                                throw IllegalStateException("이미 사용 중인 아이디입니다.")
+                            }
+
+                            // 1) Auth 계정 생성 (email/password)
+                            val result = auth.createUserWithEmailAndPassword(emailText, passwordText).await()
+                            val uid = result.user?.uid ?: throw IllegalStateException("uid 생성 실패")
+
+                            // 2) Firestore에 프로필 저장 (users/{uid})
+                            val profile = UserProfile(
+                                uid = uid,
+                                email = emailText,
+                                username = idText
+                            )
+
+                            db.collection("users")
+                                .document(uid)
+                                .set(profile)
+                                .await()
+
+                            // 3) 성공 → 이동
+                            navController.navigate("signup_complete")
+                        } catch (e: Exception) {
+                            errorMsg = e.message ?: "회원가입 중 오류가 발생했어요."
+                        } finally {
+                            loading = false
+                        }
+                    }
                 },
                 // [수정됨] 유효성 검사 결과에 따라 버튼 활성/비활성 결정
-                enabled = isFormValid,
+                enabled = isFormValid && !loading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
@@ -149,6 +203,12 @@ fun SignupScreen(navController: NavController) {
                     fontWeight = FontWeight.Bold
                 )
             }
+
+            if (errorMsg != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(text = errorMsg!!, color = Color.Red, fontSize = 12.sp)
+            }
+
         }
 
         // 2. 하단 선인장 장식

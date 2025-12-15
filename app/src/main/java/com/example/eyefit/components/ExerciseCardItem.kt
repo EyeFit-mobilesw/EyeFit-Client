@@ -19,7 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.eyefit.model.ExerciseData
+import com.example.eyefit.data.model.ExerciseData
 
 @Composable
 fun ExerciseCardItem(

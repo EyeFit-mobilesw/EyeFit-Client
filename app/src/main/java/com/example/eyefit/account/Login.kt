@@ -25,10 +25,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import com.example.eyefit.data.firebase.FirebaseProvider
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 // import com.example.eyefit.pixelFont // 패키지 구조에 따라 import 필요 여부가 다를 수 있음
 
 @Composable
 fun LoginScreen(navController: NavController) {
+
+    val auth = remember { FirebaseProvider.auth }
+    val db = remember { FirebaseProvider.db }
+    val scope = rememberCoroutineScope()
+
+    var errorMsg by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(false) }
+
     // 색상 정의
     val backgroundColor = Color(0xFF222222)
     val mainColor = Color(0xFF2CCEF3) // 버튼 및 테두리 하늘색
@@ -127,12 +138,41 @@ fun LoginScreen(navController: NavController) {
             // 4. 로그인 버튼
             Button(
                 onClick = {
-                    navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+                    scope.launch {
+                        loading = true
+                        errorMsg = null
+
+                        try {
+                            // 1) username(아이디)로 users에서 email 찾기
+                            val snap = db.collection("users")
+                                .whereEqualTo("username", idText)
+                                .limit(1)
+                                .get()
+                                .await()
+
+                            if (snap.isEmpty) {
+                                throw IllegalStateException("존재하지 않는 아이디입니다.")
+                            }
+
+                            val email = snap.documents[0].getString("email")
+                                ?: throw IllegalStateException("이 계정에 이메일 정보가 없어요.")
+
+                            // 2) email+password로 Auth 로그인
+                            auth.signInWithEmailAndPassword(email, passwordText).await()
+
+                            // 3) 성공 이동
+                            navController.navigate("home") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        } catch (e: Exception) {
+                            errorMsg = e.message ?: "로그인 실패"
+                        } finally {
+                            loading = false
+                        }
                     }
                 },
                 // [수정됨] 유효성 검사 결과에 따라 활성/비활성
-                enabled = isLoginValid,
+                enabled = isLoginValid && !loading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
@@ -151,6 +191,12 @@ fun LoginScreen(navController: NavController) {
                     fontWeight = FontWeight.Bold
                 )
             }
+
+            if (errorMsg != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(text = errorMsg!!, color = Color.Red, fontSize = 12.sp)
+            }
+
 
             Spacer(modifier = Modifier.height(20.dp))
 
