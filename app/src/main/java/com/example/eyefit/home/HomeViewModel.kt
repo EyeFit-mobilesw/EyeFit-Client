@@ -1,4 +1,4 @@
-package com.example.eyefit.ui.home
+package com.example.eyefit.home
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class HomeViewModel : ViewModel() {
 
-    private val _currentDay = MutableStateFlow(2)
+    private val _currentDay = MutableStateFlow(7)
     val currentDay: StateFlow<Int> = _currentDay
 
     fun moveToNextDay() {

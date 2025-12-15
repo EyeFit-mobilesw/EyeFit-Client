@@ -1,4 +1,4 @@
-package com.example.eyefit.ui.habit
+package com.example.eyefit.habit
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,7 +36,7 @@ fun EyeHabitScreen(
             tint = Color.White,
             modifier = Modifier
                 .padding(start = 21.dp, top = 70.dp)
-                .size(28.dp)
+                .size(25.dp)
                 .clickable { onBack() }
         )
 
@@ -56,7 +56,7 @@ fun EyeHabitScreen(
                 text = "체크해봐요",
                 color = Color.White,
                 fontSize = 30.sp,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Medium
             )
 
             Spacer(modifier = Modifier.height(42.dp))
@@ -97,7 +97,8 @@ fun HabitCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(240.dp),
+            .height(240.dp)
+            .clickable { onClick() },   // ⭐ 카드 전체 클릭 가능!
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
@@ -142,6 +143,7 @@ fun HabitCard(
                     )
                 }
 
+                // 👉 버튼 클릭도 동일한 onClick 호출
                 Box(
                     modifier = Modifier
                         .size(44.dp)

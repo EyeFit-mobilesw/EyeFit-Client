@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "987115532046",
+    "project_id": "eyefit-239e4",
+    "storage_bucket": "eyefit-239e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:987115532046:android:b1ec9b902257576078f15f",
+        "android_client_info": {
+          "package_name": "com.example.eyefit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK6uNFXsO5veyhtcpggaqO9J4fqyx3PR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
