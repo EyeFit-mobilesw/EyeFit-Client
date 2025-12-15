@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.eyefit.components.ExerciseCardItem
+import com.example.eyefit.model.exerciseList
 
 // [데이터 모델]
 data class ExerciseData(
@@ -37,11 +38,6 @@ fun ExerciseHomeScreen(navController: NavController) {
     val backgroundColor = Color(0xFF222222)
     val mainBlue = Color(0xFF2CCEF3)
     val badgeYellow = Color(0xFFFFF383)
-
-    val exerciseList = listOf(
-        ExerciseData("8자 그리기 운동", "눈 혈액순환 개선", "3분 30초", R.drawable.img_infinity),
-        ExerciseData("눈 깜빡이기 운동", "안구 건조 완화", "7분 00초", R.drawable.img_blink)
-    )
 
     Column(
         modifier = Modifier
@@ -133,10 +129,23 @@ fun ExerciseHomeScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
                     contentPadding = PaddingValues(end = 20.dp)
                 ) {
+                    // exerciseList를 사용
                     itemsIndexed(exerciseList) { index, exercise ->
-                        ExerciseCardItem(index = index + 1, data = exercise, badgeColor = badgeYellow)
+                        Box(
+                            modifier = Modifier.clickable {
+                                // [클릭 이벤트] 상세 페이지로 ID 전달하며 이동
+                                navController.navigate("exercise_detail/${exercise.id}")
+                            }
+                        ) {
+                            ExerciseCardItem(
+                                index = index + 1,
+                                data = exercise,
+                                badgeColor = badgeYellow
+                            )
+                        }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(30.dp))
 
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
