@@ -5,12 +5,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.eyefit.ExerciseHomeScreen
 import com.example.eyefit.LoginScreen
 import com.example.eyefit.OnBoardingScreen
 import com.example.eyefit.SignupCompleteScreen
 import com.example.eyefit.SignupScreen
 import com.example.eyefit.home.HomeScreen
-import com.example.eyefit.exercise.ExerciseScreen
 import com.example.eyefit.habit.DailyHabitCheckScreen
 import com.example.eyefit.habit.EyeHabitScreen
 
@@ -23,14 +23,14 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
     ) {
         composable(route = "home") {
             HomeScreen(
-                onStartExercise = { navController.navigate("exercise") },
+                onStartExercise = { navController.navigate("exercise_home") },
                 onHabitDetailClick = { navController.navigate("habit_detail") }
             )
         }
 
 
-        composable("exercise") {
-            ExerciseScreen()
+        composable(route = "exercise_home") {
+            ExerciseHomeScreen(navController = navController)
         }
 
         composable(route = "habit_detail") {
