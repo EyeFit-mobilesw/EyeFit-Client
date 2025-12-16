@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class HomeViewModel : ViewModel() {
 
-    private val _currentDay = MutableStateFlow(5)
+    private val _currentDay = MutableStateFlow(7)
     val currentDay: StateFlow<Int> = _currentDay
 
     fun moveToNextDay() {
