@@ -113,7 +113,7 @@ fun ExerciseHomeScreen(
             Image(
                 painter = painterResource(id = R.drawable.img_cloud),
                 contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 5.dp, start = 80.dp).size(50.dp)
+                modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 0.dp, start = 80.dp).size(50.dp)
             )
             Image(
                 painter = painterResource(id = R.drawable.running_tomato),
@@ -205,7 +205,9 @@ fun ExerciseHomeScreen(
 
                 // 운동 시작 버튼
                 Button(
-                    onClick = { /* TODO: 운동 플레이어 화면으로 이동 */ },
+                    onClick = {
+                        navController.navigate("exercise_player")
+                    },
                     modifier = Modifier.fillMaxWidth().height(55.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = mainBlue),
