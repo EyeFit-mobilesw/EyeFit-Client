@@ -128,8 +128,8 @@ object ExerciseRepository {
                 imageResId = imgRes,
                 isUnlocked = isUnlocked,
                 isSelected = isSelected,
-                descriptionTitle = "운동 방법", // DB에 필드가 있다면 exercise.description 사용
-                descriptionContent = if(isUnlocked) exercise.description else ""
+                descriptionTitle = exercise.description, // DB에 필드가 있다면 exercise.description 사용
+                descriptionContent = if(isUnlocked) exercise.detailedDescription else ""
             )
         }
         _uiListFlow.value = newList
