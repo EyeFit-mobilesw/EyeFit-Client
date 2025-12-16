@@ -165,7 +165,10 @@ fun SignupScreen(navController: NavController) {
                             val profile = UserProfile(
                                 uid = uid,
                                 email = emailText,
-                                username = idText
+                                username = idText,
+                                points = 90,
+                                unlockedExercises = listOf(1, 2, 3, 4, 5),
+                                playlist = listOf(1)
                             )
 
                             db.collection("users")
