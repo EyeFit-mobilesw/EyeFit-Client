@@ -32,7 +32,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
 
     NavHost(
         navController = navController,
-        startDestination = "exercise_home"
+        startDestination = "onboarding"
     ) {
         composable(route = "home") {
             HomeScreen(
