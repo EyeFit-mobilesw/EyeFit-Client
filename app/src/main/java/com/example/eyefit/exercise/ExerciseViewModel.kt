@@ -61,4 +61,13 @@ class ExerciseViewModel : ViewModel() {
         // 실제 DB 저장 로직이 필요하다면 여기서 호출
         // 지금은 Repository 메모리에 이미 저장되어 있으므로 아무것도 안 해도 됨
     }
+
+    // [추가] 플레이어 화면에서 사용할 운동 리스트
+    val playlist: List<ExerciseUiModel>
+        get() = ExerciseRepository.uiListFlow.value.filter { it.isSelected }
+
+    // [추가] 포인트 적립 함수
+    fun addPoints(amount: Int) {
+        ExerciseRepository.addPoints(amount)
+    }
 }

@@ -20,6 +20,7 @@ import com.example.eyefit.SignupCompleteScreen
 import com.example.eyefit.SignupScreen
 import com.example.eyefit.exercise.ExerciseDetailScreen
 import com.example.eyefit.exercise.ExerciseListScreen
+import com.example.eyefit.exercise.ExercisePlayerScreen
 import com.example.eyefit.home.HomeScreen
 import com.example.eyefit.habit.DailyHabitCheckScreen
 import com.example.eyefit.habit.EyeHabitScreen
@@ -31,7 +32,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "onboarding"
     ) {
         composable(route = "home") {
             HomeScreen(
@@ -57,6 +58,12 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         // [추가됨] 전체 운동 리스트 (운동 변경하기) 화면
         composable(route = "exercise_list") {
             ExerciseListScreen(navController = navController)
+        }
+
+        composable("exercise_player") {
+            ExercisePlayerScreen(
+                navController = navController,
+            )
         }
 
         composable(route = "habit_detail") {

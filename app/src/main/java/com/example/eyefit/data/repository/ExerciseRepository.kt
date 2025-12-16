@@ -45,7 +45,7 @@ object ExerciseRepository {
     val userPoints: StateFlow<Int> = _userPoints.asStateFlow()
 
     // [3] 플레이리스트 (사용자가 선택한 운동 ID 저장소) - DB 역할
-    private val selectedExerciseIds = mutableSetOf<Long>()
+    private val selectedExerciseIds = mutableSetOf<Long>(1)
 
     // [4] 실시간 데이터 스트림 (방송국 역할)
     // 뷰모델들은 이제 이 _uiListFlow만 바라봅니다.
