@@ -22,7 +22,7 @@ object ExerciseRepository {
     )
 
     // [2] 사용자 상태 (잠금 여부)
-    private val userStatus = listOf(
+    private var userStatus = listOf(
         UserExerciseEntity(1, 100, 1, true),
         UserExerciseEntity(2, 100, 2, true),
         UserExerciseEntity(3, 100, 3, true),
@@ -30,6 +30,10 @@ object ExerciseRepository {
         UserExerciseEntity(5, 100, 5, true),
         UserExerciseEntity(6, 100, 6, false)
     )
+
+    // [1] 사용자 포인트 (초기값 50으로 설정하여 '부족함' 테스트 가능하게 함)
+    private val _userPoints = MutableStateFlow(50)
+    val userPoints: StateFlow<Int> = _userPoints.asStateFlow()
 
     // [3] 플레이리스트 (사용자가 선택한 운동 ID 저장소) - DB 역할
     private val selectedExerciseIds = mutableSetOf<Long>()
@@ -70,6 +74,46 @@ object ExerciseRepository {
         }
         // 구독자들에게 새 데이터 전송
         _uiListFlow.value = newList
+    }
+
+    // [2] 운동 잠금 해제 요청 (성공 시 true, 포인트 부족 시 false 반환)
+    fun unlockExercise(exerciseId: Long): Boolean {
+        val cost = 100
+        val currentPoints = _userPoints.value
+
+        if (currentPoints >= cost) {
+            // 1. 포인트 차감
+            _userPoints.update { it - cost }
+
+            // 2. 잠금 상태 해제 (userStatus 리스트 업데이트)
+            // 실제로는 DB 업데이트가 필요하지만, 여기선 메모리 리스트 수정
+            val existingStatus = userStatus.find { it.exerciseId == exerciseId }
+            if (existingStatus != null) {
+                // 불변 리스트라 교체 작업 (Mock Logic)
+                userStatus = userStatus.map {
+                    if (it.exerciseId == exerciseId) it.copy(isUnlocked = true) else it
+                }
+            } else {
+                // 없으면 새로 생성
+                userStatus = userStatus + UserExerciseEntity(
+                    id = userStatus.size.toLong() + 1,
+                    userId = 100,
+                    exerciseId = exerciseId,
+                    isUnlocked = true
+                )
+            }
+
+            // 3. 데이터 갱신 알림
+            refreshData()
+            return true
+        } else {
+            return false // 포인트 부족
+        }
+    }
+
+    // 테스트용: 포인트 충전 함수 (필요 시 사용)
+    fun addPoints(amount: Int) {
+        _userPoints.update { it + amount }
     }
 
     // [기능] 선택 상태 토글 (뷰모델이 호출함)

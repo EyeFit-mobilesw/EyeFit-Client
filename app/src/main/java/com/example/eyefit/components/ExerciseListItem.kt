@@ -39,7 +39,7 @@ fun ExerciseListItem(
             .fillMaxWidth()
             .shadow(10.dp, RoundedCornerShape(16.dp))
             .background(backgroundColor, RoundedCornerShape(16.dp))
-            .clickable(enabled = data.isUnlocked) { onClick() } // 잠겨있으면 클릭 불가
+            .clickable { onClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
