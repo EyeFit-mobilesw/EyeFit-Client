@@ -3,6 +3,7 @@ package com.example.eyefit.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,13 +20,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.eyefit.data.model.ExerciseData
+import com.example.eyefit.data.model.ExerciseUiModel // [중요] 수정된 데이터 모델 Import
 
 @Composable
 fun ExerciseCardItem(
     index: Int,
-    data: ExerciseData,
-    badgeColor: Color
+    data: ExerciseUiModel, // [변경] ExerciseData -> ExerciseUiModel
+    badgeColor: Color = Color(0xFFFFF383), // 기본 노란색
+    onRemoveClick: () -> Unit = {} // [추가] 삭제 버튼 클릭 이벤트
 ) {
     Box(
         modifier = Modifier
@@ -41,8 +43,9 @@ fun ExerciseCardItem(
             contentDescription = "Remove",
             tint = Color.LightGray,
             modifier = Modifier
-                .size(16.dp)
+                .size(18.dp) // 터치 영역 고려하여 아이콘 크기 살짝 조정
                 .align(Alignment.TopEnd)
+                .clickable { onRemoveClick() } // [추가] 클릭 시 삭제 동작 수행
         )
 
         Column(
@@ -69,13 +72,15 @@ fun ExerciseCardItem(
                 Text(
                     text = data.title,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    maxLines = 1 // 텍스트 넘침 방지
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = data.subTitle,
                     color = Color(0xFF8D8D8D),
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    maxLines = 1
                 )
             }
 
@@ -85,19 +90,20 @@ fun ExerciseCardItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // [시간 배지] - 요청하신 테두리 적용
+                // [시간 배지] - 테두리 이슈 해결 적용 (Border -> Background -> Padding)
                 Box(
                     modifier = Modifier
-                        .background(badgeColor, RoundedCornerShape(12.dp))
                         .border(
-                            width = 0.8.dp,              // 테두리 굵기 0.8dp
-                            color = Color(0xFF8D8D8D),   // 테두리 색상
+                            width = 0.8.dp,
+                            color = Color(0xFF8D8D8D),
                             shape = RoundedCornerShape(12.dp)
                         )
+                        .background(badgeColor, RoundedCornerShape(12.dp))
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = data.time,
+                        // [변경] data.time -> data.timeString (새 모델 필드명)
+                        text = data.timeString,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF222222)
@@ -110,8 +116,7 @@ fun ExerciseCardItem(
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .width(50.dp)
-                        .height(50.dp)
+                        .size(50.dp) // width/height 대신 size로 통일
                 )
             }
         }
