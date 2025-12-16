@@ -3,26 +3,30 @@ package com.example.eyefit.home
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.eyefit.R
 import com.example.eyefit.components.CharacterWithBackground
-import com.example.eyefit.components.DailyProgressBar
 import com.example.eyefit.components.EyefitButton
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.DisposableEffect
 import com.example.eyefit.data.firebase.FirebaseProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -34,19 +38,15 @@ fun HomeScreen(
     onHabitDetailClick: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
-
     val day by viewModel.currentDay.collectAsState()
-    // ✅ 오늘 습관 달성 개수 (Firestore에서 items true 개수)
+
+    // ✅ 오늘 습관 달성 개수 (Firestore에서 items true 개수) 실시간 반영
     val db = remember { FirebaseProvider.db }
     val uid = FirebaseProvider.auth.currentUser?.uid
-
-    val todayKey = remember {
-        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-    }
+    val todayKey = remember { LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
 
     var todayAchievedCount by remember { mutableStateOf(0) }
 
-    // ✅ 오늘 문서 실시간 반영: users/{uid}/habitChecks/{todayKey}
     DisposableEffect(uid, todayKey) {
         if (uid == null) {
             todayAchievedCount = 0
@@ -65,7 +65,6 @@ fun HomeScreen(
             onDispose { reg.remove() }
         }
     }
-
 
     // Day 배경
     val backgroundRes = when (day) {
@@ -86,7 +85,7 @@ fun HomeScreen(
         4 -> "푸르른\n오아시스에\n가까워지는 중!"
         5 -> "서늘한\n공기를 피한\n빠른 지름길!"
         6 -> "포근한 햇살\n덕분에\n촉촉한 눈"
-        else -> "눈처럼\n맑고 깨끗한\n눈 건강 만들기 성공!"
+        else -> "눈처럼 맑고 깨끗한\n눈 건강 만들기 성공!\n오아시스에 도착!"
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -99,7 +98,7 @@ fun HomeScreen(
         )
 
         // -------------------------------
-        // 🔥 진행바 + 캐릭터 + 요일라벨
+        // 진행바 + 캐릭터 + 요일라벨
         // -------------------------------
         Column(
             modifier = Modifier
@@ -108,45 +107,7 @@ fun HomeScreen(
                 .padding(top = 490.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            val progressWidth = progressForDay(day)
-
-            // 진행바 전체 묶음
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(90.dp),     // 진행바 + 캐릭터 공간
-                contentAlignment = Alignment.Center
-            ) {
-
-                // (1) 배경 + 검은 진행바
-                DailyProgressBar(
-                    day = day,
-                    progressWidth = progressWidth,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(14.dp)
-                        .align(Alignment.Center)
-                )
-
-                // (2) 요일 라벨
-                DayProgressLabels(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .offset(y = 0.dp)
-                )
-
-                // (3) 캐릭터 이동 — Day4 이후에도 정상 동작
-                CharacterWithBackground(
-                    day = day,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .offset(
-                            x = (progressWidth * 300).dp,
-                            y = (-45).dp
-                        )
-                )
-            }
+            JourneyProgress(day = day)
         }
 
         // ------------------------------
@@ -218,7 +179,6 @@ fun HomeScreen(
                 color = Color.White,
                 shadowElevation = 6.dp
             ) {
-
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
@@ -258,20 +218,136 @@ fun HomeScreen(
     }
 }
 
-
+/**
+ * - Day1~3: 오른쪽에 붙고, 라벨 Day1~Day6만 보임
+ * - Day4~7: 왼쪽에 붙고, 라벨 Day3~Day7~도착 보임
+ * - 진행 바: 현재 Day "원 중심"까지
+ * - Day7일 때만 도착까지 끝
+ */
 @Composable
-fun DayProgressLabels(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 30.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text("Day 3")
-        Text("Day 4")
-        Text("Day 5")
-        Text("Day 6")
-        Text("Day 7")
-        Text("도착")
+private fun JourneyProgress(
+    day: Int,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(90.dp)
+) {
+    val safeDay = day.coerceIn(1, 7)
+    val isEarly = safeDay <= 3
+
+    // ✅ 라벨 윈도우
+    val labels: List<String> = if (isEarly) {
+        (1..6).map { "Day $it" }                 // Day1~Day6
+    } else {
+        (3..7).map { "Day $it" } + "도착"        // Day3~Day7~도착
+    }
+
+    // 현재 Day가 labels에서 몇 번째인지
+    val currentIdx = if (isEarly) {
+        (safeDay - 1).coerceIn(0, 5)
+    } else {
+        (safeDay - 3).coerceIn(0, 4) // Day7 -> idx 4 (도착은 idx 5)
+    }
+
+    val trackHeight = 15.dp
+    val circleSize = 44.dp
+    val r = circleSize / 2
+
+    BoxWithConstraints(modifier = modifier) {
+        val trackWidth = (maxWidth * 0.92f).coerceAtLeast(260.dp)
+        val trackAlign = if (isEarly) Alignment.CenterEnd else Alignment.CenterStart
+
+        Box(
+            modifier = Modifier
+                .width(trackWidth)
+                .fillMaxHeight()
+                .align(trackAlign)
+        ) {
+            val stops = labels.size // 항상 6
+            val spacing = (trackWidth - circleSize) / (stops - 1)
+
+            fun centerX(i: Int): Dp = r + spacing * i
+
+            // ✅ 진행 바 끝: 원 중심까지
+            // ✅ Day7이면 도착까지 끝
+            val progressWidth: Dp = if (!isEarly && safeDay == 7) {
+                trackWidth
+            } else {
+                centerX(currentIdx)
+            }
+
+            // (1) 흰 트랙 + 검은 진행바
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .fillMaxWidth()
+                    .height(trackHeight)
+                    .clip(RoundedCornerShape(50))
+                    .background(Color.White.copy(alpha = 0.95f))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(progressWidth)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.Black)
+                )
+            }
+
+            // (2) 캐릭터 위치: 현재 원 중심에 맞춤
+            val characterCenterX = centerX(currentIdx)
+            CharacterWithBackground(
+                day = safeDay,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .offset(
+                        x = characterCenterX - 50.dp,   // 캐릭터 중심 맞춤용
+                        y = (-45).dp
+                    )
+            )
+
+            // 바와 day 사이의 간격 조정
+            val labelTop = 60.dp
+
+            for (i in 0 until stops) {
+                val label = labels[i]
+                val xLeft = centerX(i) - r
+
+                Box(
+                    modifier = Modifier
+                        .offset(x = xLeft, y = labelTop)
+                        .size(circleSize),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val isCurrentDayCircle =
+                        label.startsWith("Day ") && label == "Day $safeDay"
+
+                    if (isCurrentDayCircle) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                                .background(Color.Black),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = label,
+                            color = Color.Black,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
     }
 }
