@@ -1,5 +1,6 @@
 package com.example.eyefit.exercise
 
+import android.R.attr.fontWeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -150,84 +152,86 @@ fun UnlockDialog(
     onAdClick: () -> Unit
 ) {
     val isInsufficient = currentPoints < requiredPoints
-    val popupBlue = Color(0xFF5CC1F0)
-    val popupGray = Color(0xFF666666) // 광고 버튼 색상
-    val warningRed = Color(0xFFFF5252)
+
+    // 디자인 색상 정의
+    // 그라데이션 브러시 정의 (2CCEF3 -> 88DEF2)
+    val gradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            Color(0xFF2CCEF3),
+            Color(0xFF88DEF2)
+        )
+    )
+    val warningRed = Color(0xFFFF5252) // 경고 문구 빨간색
+    val adButtonBg = Color(0xFF424242).copy(alpha = 0.8f) // 광고 버튼 배경 (어두운 회색)
+    val adButtonBorder = Color(0xFF2CCEF3) // 광고 버튼 테두리용 (기존 mainBlue)
 
     Dialog(onDismissRequest = onDismiss) {
-        // 팝업 배경 (카드)
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White), // 반투명 배경 효과 원하면 수정
+        // 흰색 Card 배경을 제거하고, 투명한 Column 사용
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 10.dp) // 좌우 여백
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // 1. 타이틀
-                Text(
-                    text = exerciseTitle, // "눈 운동 팩" 대신 운동 이름 표시
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "눈 운동", // 서브타이틀 고정 or 파라미터로 받기
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // [조건부] 포인트 부족 경고 메시지
-                if (isInsufficient) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info, // 느낌표 아이콘
-                            contentDescription = null,
-                            tint = warningRed,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "포인트가 부족합니다",
-                            color = warningRed,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
-                // 2. 포인트 결제 버튼 (메인 버튼)
-                Button(
-                    onClick = { if (!isInsufficient) onUnlockClick() },
-                    // 포인트가 부족하면 클릭은 되지만 동작 안 하게 하거나, 아예 비활성화 할 수 있음
-                    // 디자인상 비활성화 색상이 아니라 그대로 유지되길 원하면 enabled=true 유지
-                    enabled = true,
-                    shape = RoundedCornerShape(30.dp), // 둥근 알약 모양
-                    colors = ButtonDefaults.buttonColors(containerColor = popupBlue),
+            // [1] 포인트 부족 경고 메시지 (부족할 때만 표시)
+            if (isInsufficient) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp) // 버튼 높이 키움
+                        .background(Color.Transparent)
+                        .padding(bottom = 12.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Info, // i 아이콘
+                        contentDescription = null,
+                        tint = warningRed,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "포인트가 부족합니다",
+                        color = warningRed,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            // [2] 포인트 결제 버튼 (하늘색)
+            Button(
+                onClick = { if (!isInsufficient) onUnlockClick() },
+                enabled = true, // 디자인 유지를 위해 클릭은 되게 하되 로직에서 막음
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent
+                ),
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp) // 버튼 높이
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(gradientBrush), // 그라데이션 적용
+                    contentAlignment = Alignment.Center
+                )
+                {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        // 코인 아이콘 + 가격
+                        // 아이콘 + 100p
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "🪙", fontSize = 24.sp) // 코인 이미지 대신 이모지
+                            // 코인 아이콘 (이미지 리소스가 있다면 교체 추천)
+                            // Icon(painter = painterResource(R.drawable.ic_coin), ...)
+                            Text(text = "🪙", fontSize = 20.sp) // 임시 이모지
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "${requiredPoints}p",
-                                fontSize = 28.sp,
+                                fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
@@ -235,31 +239,33 @@ fun UnlockDialog(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "보유 포인트 : ${currentPoints}p",
-                            fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            fontSize = 14.sp,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                     }
                 }
+            }
 
-                Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                // 3. 광고 보고 잠금 해제 버튼 (서브 버튼)
-                Button(
-                    onClick = onAdClick,
-                    shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = popupGray), // 짙은 회색
-                    border = null, // 테두리 없음
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                ) {
-                    Text(
-                        text = "광고 보고 잠금 해제",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White
-                    )
-                }
+            // [3] 광고 보고 잠금 해제 버튼 (어두운 배경 + 테두리)
+            Button(
+                onClick = onAdClick,
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = adButtonBg
+                ),
+                border = androidx.compose.foundation.BorderStroke(2.dp, adButtonBorder), // 하늘색 테두리
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+            ) {
+                Text(
+                    text = "광고 보고 잠금 해제",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     }

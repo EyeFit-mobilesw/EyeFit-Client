@@ -18,7 +18,16 @@ object ExerciseRepository {
         ExerciseEntity(3, "눈 근육 스트레칭", "홍채 근육 단련", "", "", 120, "img_stretch", ""),
         ExerciseEntity(4, "눈 콧등 마사지", "눈 피로도 개선", "", "", 90, "img_massage", ""),
         ExerciseEntity(5, "X자 그리기 운동", "시력 개선 도움", "", "", 150, "img_x_shape", ""),
-        ExerciseEntity(6, "잠금된 운동", "눈 운동 지속 완료 시 오픈 예정", "", "", 0, "ic_lock", "")
+        ExerciseEntity(
+            id = 6,
+            title = "매직 아이 운동",
+            subTitle = "집중력 향상 최고",
+            description = "...",
+            detailedDescription = "...",
+            time = 180,
+            imageUrl = "img_infinity", // 잠금 해제되면 보일 이미지 (테스트용으로 기존 이미지 사용)
+            animationUrl = ""
+        )
     )
 
     // [2] 사용자 상태 (잠금 여부)
@@ -49,30 +58,42 @@ object ExerciseRepository {
     }
 
     // 내부 데이터를 다시 계산해서 Flow에 쏘는 함수
+    // ExerciseRepository.kt 내부
+
     private fun refreshData() {
         val newList = allExercises.map { exercise ->
             val status = userStatus.find { it.exerciseId == exercise.id }
             val isUnlocked = status?.isUnlocked ?: false
-
-            // [중요] 저장된 ID set에 포함되어 있으면 selected = true
             val isSelected = selectedExerciseIds.contains(exercise.id)
 
-            val min = exercise.time / 60
-            val sec = exercise.time % 60
-            val timeStr = if (exercise.time > 0) "%d분 %02d초".format(min, sec) else ""
-            val imgRes = getDrawableIdByName(exercise.imageUrl)
+            // [핵심 로직 추가] 잠금 상태에 따라 보여줄 텍스트와 이미지 결정
+            val displayTitle = if (isUnlocked) exercise.title else "잠금된 운동"
+            val displaySubTitle = if (isUnlocked) exercise.subTitle else "눈 운동 지속 완료 시 오픈 예정"
+            val displayTimeStr = if (isUnlocked && exercise.time > 0) {
+                val min = exercise.time / 60
+                val sec = exercise.time % 60
+                "%d분 %02d초".format(min, sec)
+            } else {
+                "" // 잠겨있으면 시간 표시 안 함
+            }
+
+            // 잠겨있으면 자물쇠 아이콘(R.drawable.ic_lock), 풀려있으면 원본 이미지
+            val displayImgRes = if (isUnlocked) {
+                getDrawableIdByName(exercise.imageUrl)
+            } else {
+                R.drawable.ic_lock // 자물쇠 이미지 리소스 ID (없으면 추가 필요)
+            }
 
             ExerciseUiModel(
                 id = exercise.id,
-                title = exercise.title,
-                subTitle = exercise.subTitle,
-                timeString = timeStr,
-                imageResId = imgRes,
+                title = displayTitle,       // 변환된 타이틀
+                subTitle = displaySubTitle, // 변환된 서브타이틀
+                timeString = displayTimeStr,// 변환된 시간
+                imageResId = displayImgRes, // 변환된 이미지
                 isUnlocked = isUnlocked,
-                isSelected = isSelected // 여기가 핵심!
+                isSelected = isSelected
             )
         }
-        // 구독자들에게 새 데이터 전송
         _uiListFlow.value = newList
     }
 
