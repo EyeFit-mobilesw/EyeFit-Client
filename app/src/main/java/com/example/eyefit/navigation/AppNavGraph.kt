@@ -25,6 +25,7 @@ import com.example.eyefit.habit.DailyHabitCheckScreen
 import com.example.eyefit.habit.EyeHabitScreen
 
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(navController: NavHostController = rememberNavController()) {
@@ -106,5 +107,6 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable("signup_complete") {
             SignupCompleteScreen(navController)
         }
+
     }
 }

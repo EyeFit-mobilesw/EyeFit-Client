@@ -144,10 +144,10 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "지속적인 운동을 위해 알람 맞추기  >",
+                text = "지속적인 운동을 위해 운동하러 가볼까요?",
                 color = Color(0xFF1A1A1A),
                 fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
 
             Spacer(modifier = Modifier.height(270.dp))
