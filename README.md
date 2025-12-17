@@ -18,7 +18,7 @@
 
 ---
 
-## 주요 화면
+## 💻 주요 화면
 - Home
   <img width="1920" height="1080" alt="기능1" src="https://github.com/user-attachments/assets/30c55b89-ab38-4c50-9f98-6127863e6341" />
 - Exercise Page
@@ -59,10 +59,11 @@
 </div>
 
 ---
+
 ## 🤝 Contributors
 <br>
 
 | 이름     | 개발분야  | 개인 레포                                         | 역할                    |
 | -------- | --------- | ------------------------------------------------- | ------------------------- |
-| 👀 이현정 | Back-end | [hyhy-j](https://github.com/hyhy-j)  | 운동 |
-| 👀 서문지 | Back-end | [SEOMUNJI](https://github.com/SEOMUNJI)  | ㅇㄴ |
+| 👀 이현정 | PM, Front-end, Back-end | [hyhy-j](https://github.com/hyhy-j)  | 운동 |
+| 👀 서문지 | PM, Front-end, Back-end | [SEOMUNJI](https://github.com/SEOMUNJI)  | ㅇㄴ |
