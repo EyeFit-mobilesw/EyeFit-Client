@@ -19,11 +19,11 @@
 ---
 
 ## 💻 주요 화면
-- Home
+### Home
   <img width="1920" height="1080" alt="기능1" src="https://github.com/user-attachments/assets/30c55b89-ab38-4c50-9f98-6127863e6341" />
-- Exercise Page
+### Exercise Page
   <img width="1920" height="1080" alt="기능2" src="https://github.com/user-attachments/assets/b1747bd7-2c20-438e-ace1-7131227351d1" />
-- Habit Page
+### Habit Page
   <img width="1920" height="1080" alt="기능3" src="https://github.com/user-attachments/assets/add764df-3e0e-48d0-bab2-b73153757ece" />
 
 ---
