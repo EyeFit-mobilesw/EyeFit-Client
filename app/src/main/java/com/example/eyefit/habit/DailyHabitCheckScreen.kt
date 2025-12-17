@@ -40,7 +40,7 @@ fun DailyHabitCheckScreen(
         SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(Date())
     }
 
-    // ✅ Firestore에 저장할 습관 key (index 순서와 1:1 매칭)
+    // Firestore에 저장할 습관 key (index 순서와 1:1 매칭)
     val habitKeys = remember {
         listOf(
             "SMARTPHONE_LIMIT",
@@ -70,7 +70,7 @@ fun DailyHabitCheckScreen(
     var didLoadOnce by remember { mutableStateOf(false) }
 
     /** ---------------------------
-     *  ✅ 화면 진입 시: 오늘 기록 Firestore에서 불러오기
+     *  화면 진입 시: 오늘 기록 Firestore에서 불러오기
      *  users/{uid}/habitChecks/{dateKey}
     ----------------------------- */
     LaunchedEffect(uid) {
@@ -255,7 +255,7 @@ fun DailyHabitCheckScreen(
                         errorMsg = null
 
                         try {
-                            // ✅ Firestore 저장 데이터
+                            // Firestore 저장 데이터
                             val itemsMap: Map<String, Boolean> =
                                 habitKeys.mapIndexed { idx, key -> key to habitStates[idx] }.toMap()
 
@@ -314,7 +314,7 @@ fun DailyHabitCheckScreen(
 }
 
 /* -----------------------------------------------------
-   습관 박스 (아이콘 정사각형 스타일)
+   습관 박스
 ------------------------------------------------------ */
 @Composable
 fun HabitItem(

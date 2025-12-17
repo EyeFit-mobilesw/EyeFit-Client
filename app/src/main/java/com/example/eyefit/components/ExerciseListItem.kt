@@ -101,6 +101,7 @@ fun ExerciseListItem(
                     color = Color.Black
                 )
             }
+        } else {
         }
     }
 }

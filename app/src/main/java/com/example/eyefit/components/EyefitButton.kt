@@ -40,7 +40,7 @@ fun EyefitButton(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // 👀 눈 이미지 + 중앙정렬 박스
+            // 눈 이미지 + 중앙정렬 박스
             Box(
                 modifier = Modifier.height(eyeSize.dp),
                 contentAlignment = Alignment.Center

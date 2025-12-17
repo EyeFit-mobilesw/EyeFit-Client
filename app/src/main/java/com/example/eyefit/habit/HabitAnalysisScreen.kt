@@ -46,7 +46,6 @@ fun getCurrentYearMonthWeek(): String {
 }
 
 /**
- * ✅ 새로 추가한 버전:
  * - Firestore에서 이번 주(월~일) achievedCount를 읽어서 그래프에 반영
  * - 오늘 체크 안 된 습관 3개를 추천에 반영
  */
@@ -61,7 +60,7 @@ fun HabitAnalysisScreen(
     val formatter = remember { DateTimeFormatter.ofPattern("yyyy-MM-dd") }
     val weekFields = remember { WeekFields.of(Locale.KOREA) }
 
-    // ✅ 월~일 날짜키 7개 생성
+    // 월~일 날짜키 7개 생성
     val weekKeys = remember {
         val today = LocalDate.now()
         val monday = today.with(weekFields.dayOfWeek(), 1) // 월요일
@@ -69,7 +68,7 @@ fun HabitAnalysisScreen(
     }
     val todayKey = remember { LocalDate.now().format(formatter) }
 
-    // ✅ 습관 key + 라벨 (DailyHabitCheckScreen 저장 key와 동일해야 함!)
+    // 습관 key + 라벨 (DailyHabitCheckScreen 저장 key와 동일해야 함!)
     val habitKeys = remember {
         listOf(
             "SMARTPHONE_LIMIT" to "스마트폰을 장시간 이용하지 않았다",
@@ -102,7 +101,7 @@ fun HabitAnalysisScreen(
             val startKey = weekKeys.first()
             val endKey = weekKeys.last()
 
-            // ✅ 이번 주 문서들 조회 (dateKey 필드 기준)
+            // 이번 주 문서들 조회 (dateKey 필드 기준)
             val snap = db.collection("users")
                 .document(uid)
                 .collection("habitChecks")
@@ -132,10 +131,10 @@ fun HabitAnalysisScreen(
                 }
             }
 
-            // ✅ 그래프 값 월~일 순서로 구성
+            // 그래프 값 월~일 순서로 구성
             weeklyCounts = weekKeys.map { achievedMap[it] ?: 0 }
 
-            // ✅ 오늘 문서가 쿼리 결과에 없을 수도 있으니(저장 안 했으면) 한 번 더 조회
+            // 오늘 문서가 쿼리 결과에 없을 수도 있으니(저장 안 했으면) 한 번 더 조회
             if (todayItems == null) {
                 val todayDoc = db.collection("users")
                     .document(uid)
@@ -149,7 +148,7 @@ fun HabitAnalysisScreen(
                 }
             }
 
-            // ✅ 내일 추천: 오늘 false인 항목들 중 3개
+            // 내일 추천: 오늘 false인 항목들 중 3개
             val unchecked = mutableListOf<String>()
             for ((key, label) in habitKeys) {
                 val checked = (todayItems?.get(key) as? Boolean) ?: false
@@ -184,7 +183,7 @@ fun HabitAnalysisScreen(
 }
 
 /**
- * ✅ 기존 UI는 Content로 분리 (그래프/추천을 파라미터로 받는 구조 유지)
+ * 기존 UI는 Content로 분리 (그래프/추천을 파라미터로 받는 구조 유지)
  */
 @Composable
 private fun HabitAnalysisContent(

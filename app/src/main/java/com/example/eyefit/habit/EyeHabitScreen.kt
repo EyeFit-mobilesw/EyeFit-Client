@@ -98,7 +98,7 @@ fun HabitCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(240.dp)
-            .clickable { onClick() },   // ⭐ 카드 전체 클릭 가능!
+            .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
@@ -143,7 +143,6 @@ fun HabitCard(
                     )
                 }
 
-                // 👉 버튼 클릭도 동일한 onClick 호출
                 Box(
                     modifier = Modifier
                         .size(44.dp)

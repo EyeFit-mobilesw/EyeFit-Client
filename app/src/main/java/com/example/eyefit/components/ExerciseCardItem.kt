@@ -28,7 +28,7 @@ import com.example.eyefit.R
 fun ExerciseCardItem(
     index: Int,
     data: ExerciseUiModel,
-    badgeColor: Color = Color(0xFFFFF383), // 기본 노란색
+    badgeColor: Color = Color(0xFFFFF383),
     onRemoveClick: () -> Unit = {} // 삭제 버튼 클릭 이벤트
 ) {
     Box(
@@ -45,7 +45,7 @@ fun ExerciseCardItem(
             contentDescription = "Remove",
             tint = Color.LightGray,
             modifier = Modifier
-                .size(18.dp) // 터치 영역 고려하여 아이콘 크기 살짝 조정
+                .size(18.dp)
                 .align(Alignment.TopEnd)
                 .clickable { onRemoveClick() } // 클릭 시 삭제 동작 수행
         )
@@ -92,6 +92,7 @@ fun ExerciseCardItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // [시간 배지]
                 Box(
                     modifier = Modifier
                         .border(
