@@ -1,7 +1,6 @@
 package com.example.eyefit.data.repository
 
 import android.util.Log
-import com.example.eyefit.R
 import com.example.eyefit.data.model.ExerciseEntity
 import com.example.eyefit.data.model.ExerciseUiModel
 import com.google.firebase.Firebase
@@ -19,7 +18,7 @@ object ExerciseRepository {
     private val db = Firebase.firestore
     private val auth = Firebase.auth
 
-    // [1] UI 상태 관리
+    // UI 상태 관리
     private val _uiListFlow = MutableStateFlow<List<ExerciseUiModel>>(emptyList())
     val uiListFlow: StateFlow<List<ExerciseUiModel>> = _uiListFlow.asStateFlow()
 
@@ -29,16 +28,15 @@ object ExerciseRepository {
     // 로컬 캐시
     private var cachedExercises = listOf<ExerciseEntity>()
     private var cachedUnlockedIds = mutableSetOf<Long>()
-    private val selectedExerciseIds = mutableSetOf<Long>() // 기본 선택: 1번
+    private val selectedExerciseIds = mutableSetOf<Long>()
 
     // 리스너 (로그아웃 시 해제용)
     private var userListener: ListenerRegistration? = null
 
     init {
-        // 1. 운동 데이터(Master Data)는 로그인 여부와 상관없이 불러옴
         fetchMasterData()
 
-        // 2. 로그인 상태 감지 -> 유저 데이터(포인트, 해금목록) 리스닝
+        // 로그인 상태 감지 -> 유저 데이터(포인트, 해금목록) 리스닝
         auth.addAuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
             if (user != null) {
@@ -52,15 +50,14 @@ object ExerciseRepository {
         }
     }
 
-    // --- [Master Data] 운동 목록 가져오기 ---
+    // 운동 목록 가져오기 ---
     private fun fetchMasterData() {
         db.collection("exercises").orderBy("id").get()
             .addOnSuccessListener { result ->
                 if (result.isEmpty) {
-                    // DB에 운동 데이터가 아예 없으면 업로드 (개발용)
+                    // 개발용
                     uploadInitialData()
                 } else {
-                    // [중요] toObjects가 동작하려면 Entity에 기본값이 있어야 함
                     cachedExercises = result.toObjects(ExerciseEntity::class.java)
                     Log.d("Repo", "운동 데이터 로드 완료: ${cachedExercises.size}개")
                     refreshUiData()
@@ -71,7 +68,7 @@ object ExerciseRepository {
             }
     }
 
-    // --- [User Data] 유저 정보 실시간 감지 ---
+    // 유저 정보 실시간 감지
     private fun startListeningToUser(uid: String) {
         userListener?.remove() // 기존 리스너 제거
 
@@ -84,12 +81,15 @@ object ExerciseRepository {
                 val points = snapshot.getLong("points")?.toInt() ?: 0
                 _userPoints.value = points
 
-                val unlockedList = snapshot.get("unlockedExercises") as? List<Long> ?: listOf()
+                val rawUnlocked = snapshot.get("unlockedExercises") as? List<*>
+                val unlockedList = rawUnlocked?.mapNotNull { (it as? Number)?.toLong() } ?: listOf()
+
                 cachedUnlockedIds.clear()
                 cachedUnlockedIds.addAll(unlockedList)
 
-                // [추가] DB에서 플레이리스트 가져오기
-                val dbPlaylist = snapshot.get("playlist") as? List<Long> ?: listOf(1L)
+                // DB에서 플레이리스트 가져오기
+                val rawPlaylist = snapshot.get("playlist") as? List<*>
+                val dbPlaylist = rawPlaylist?.mapNotNull { (it as? Number)?.toLong() } ?: listOf(1L)
                 selectedExerciseIds.clear()
                 selectedExerciseIds.addAll(dbPlaylist)
 
@@ -103,7 +103,7 @@ object ExerciseRepository {
         userListener = null
     }
 
-    // --- [UI Logic] 데이터 병합 ---
+    // 데이터 병합 ---
     private fun refreshUiData() {
         if (cachedExercises.isEmpty()) return
 
@@ -117,9 +117,6 @@ object ExerciseRepository {
                 "%d분 %02d초".format(exercise.time / 60, exercise.time % 60)
             } else ""
 
-            // [핵심 변경]
-            // 1. 잠금 상태면 URL을 빈 문자열("")로 설정 (UI에서 자물쇠 아이콘 표시)
-            // 2. 해금 상태면 DB에 있는 URL(exercise.imageUrl) 사용
             val displayImageUrl = if (isUnlocked) exercise.imageUrl else ""
 
             ExerciseUiModel(
@@ -127,10 +124,7 @@ object ExerciseRepository {
                 title = displayTitle,
                 subTitle = displaySubTitle,
                 timeString = displayTimeStr,
-
-                // [변경] 리소스 ID 대신 URL 전달
                 imageUrl = displayImageUrl,
-
                 isUnlocked = isUnlocked,
                 isSelected = isSelected,
                 descriptionTitle = exercise.description,
@@ -141,7 +135,7 @@ object ExerciseRepository {
         _uiListFlow.value = newList
     }
 
-    // --- [Action] 잠금 해제 ---
+    // 잠금 해제
     fun unlockExercise(exerciseId: Long): Boolean {
         val uid = auth.currentUser?.uid ?: return false
         val userDocRef = db.collection("users").document(uid)
@@ -167,19 +161,19 @@ object ExerciseRepository {
         return true
     }
 
-    // --- [Action] 포인트 적립 ---
+    // 포인트 적립
     fun addPoints(amount: Int) {
         val uid = auth.currentUser?.uid ?: return
         db.collection("users").document(uid)
             .update("points", FieldValue.increment(amount.toLong()))
     }
 
-    // --- [Action] 선택 토글 ---
+    // 선택 토글
     fun toggleExerciseSelection(id: Long) {
         val uid = auth.currentUser?.uid ?: return
         val userDocRef = db.collection("users").document(uid)
 
-        // 1. [UI 반응 속도 UP] 로컬에서 먼저 바꿈 (Optimistic Update)
+        // 로컬에서 먼저 바꿈
         if (selectedExerciseIds.contains(id)) {
             selectedExerciseIds.remove(id)
         } else {
@@ -187,12 +181,10 @@ object ExerciseRepository {
         }
         refreshUiData() // 화면 먼저 갱신
 
-        // 2. [DB 동기화] 백그라운드에서 Firestore 업데이트
+        // DB 동기화 - 백그라운드에서 Firestore 업데이트
         if (selectedExerciseIds.contains(id)) {
-            // 방금 추가했으므로 DB에도 추가 (Union)
             userDocRef.update("playlist", FieldValue.arrayUnion(id))
         } else {
-            // 방금 삭제했으므로 DB에서도 삭제 (Remove)
             userDocRef.update("playlist", FieldValue.arrayRemove(id))
         }
     }

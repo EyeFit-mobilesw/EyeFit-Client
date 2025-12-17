@@ -21,9 +21,6 @@ import com.example.eyefit.SignupScreen
 import com.example.eyefit.exercise.ExerciseDetailScreen
 import com.example.eyefit.exercise.ExerciseListScreen
 import com.example.eyefit.exercise.ExercisePlayerScreen
-import com.example.eyefit.home.HomeScreen
-import com.example.eyefit.habit.DailyHabitCheckScreen
-import com.example.eyefit.habit.EyeHabitScreen
 
 
 
@@ -56,7 +53,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             ExerciseDetailScreen(navController = navController, exerciseId = exerciseId)
         }
 
-        // [추가됨] 전체 운동 리스트 (운동 변경하기) 화면
+        // 전체 운동 리스트 (운동 변경하기) 화면
         composable(route = "exercise_list") {
             ExerciseListScreen(navController = navController)
         }
@@ -71,7 +68,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             EyeHabitScreen(
                 onBack = { navController.popBackStack() },
                 onDailyCheckClick = { navController.navigate("daily_check") },
-                onDailyAnalysisClick = { navController.navigate("habit_analysis") }  // ⭐ 수정!!
+                onDailyAnalysisClick = { navController.navigate("habit_analysis") }  //
             )
         }
 
@@ -91,9 +88,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable("onboarding") {
             OnBoardingScreen(
                 onTimeout = {
-                    // 3초 뒤 실행될 동작: 로그인 화면으로 이동
                     navController.navigate("login") {
-                        // 중요: 뒤로가기 눌렀을 때 다시 온보딩이 나오지 않게 스택 제거
                         popUpTo("onboarding") { inclusive = true }
                     }
                 }

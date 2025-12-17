@@ -6,7 +6,7 @@ data class UserProfile(
     val username: String = "",
     val createdAt: Long = System.currentTimeMillis(),
 
-    // 운동 데이터 (기본값 설정 필수)
+    // 운동 데이터
     val points: Int = 90, // 가입 시 기본 90포인트
     val unlockedExercises: List<Long> = listOf(1, 2, 3, 4, 5), // 1~5번은 기본 해제
 

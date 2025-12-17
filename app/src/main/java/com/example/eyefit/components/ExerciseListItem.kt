@@ -53,7 +53,6 @@ fun ExerciseListItem(
             contentAlignment = Alignment.Center
         ) {
             if (data.isUnlocked) {
-                // 1) 잠금 해제됨 -> URL 이미지 (Coil 사용)
                 AsyncImage(
                     model = data.imageUrl,
                     contentDescription = null,
@@ -61,7 +60,6 @@ fun ExerciseListItem(
                     modifier = Modifier.size(32.dp)
                 )
             } else {
-                // 2) 잠김 -> 로컬 자물쇠 아이콘
                 Image(
                     painter = painterResource(id = R.drawable.ic_lock),
                     contentDescription = "Locked",

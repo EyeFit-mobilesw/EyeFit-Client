@@ -32,24 +32,23 @@ import com.example.eyefit.exercise.ExerciseViewModel
 @Composable
 fun ExerciseHomeScreen(
     navController: NavController,
-    viewModel: ExerciseViewModel = viewModel() // 뷰모델 주입 (싱글톤처럼 동작하려면 Hilt나 상위 주입 필요)
+    viewModel: ExerciseViewModel = viewModel() // 뷰모델 주입
 ) {
     val backgroundColor = Color(0xFF222222)
     val mainBlue = Color(0xFF2CCEF3)
     val badgeYellow = Color(0xFFFFF383)
 
-    // 1. 전체 데이터 관찰
+    // 전체 데이터 관찰
     val allExercises by viewModel.uiList.collectAsState()
 
-    // 2. [플레이리스트] 사용자가 선택한 운동만 필터링
+    // 사용자가 선택한 운동만 필터링
     val playlist = remember(allExercises) {
         allExercises.filter { it.isSelected }
     }
 
-    // 3. [총 시간 계산] "7분 00초" 문자열 파싱하여 합산
+    // 문자열 파싱하여 합산
     val totalSeconds = remember(playlist) {
         playlist.sumOf { item ->
-            // 간단한 파싱 로직 (실제로는 모델에 Int형 time 필드가 있으면 더 좋음)
             try {
                 val min = item.timeString.substringBefore("분").trim().toInt()
                 val sec = item.timeString.substringAfter("분").substringBefore("초").trim().toInt()
@@ -68,7 +67,7 @@ fun ExerciseHomeScreen(
             .fillMaxSize()
             .background(backgroundColor)
     ) {
-        // --- 1. 상단 영역 (배경 및 장식) ---
+        // 1. 상단 영역 (배경 및 장식)
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -127,7 +126,7 @@ fun ExerciseHomeScreen(
             )
         }
 
-        // --- 2. 하단 영역 (리스트 및 컨트롤) ---
+        // 2. 하단 영역 (리스트 및 컨트롤)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -143,7 +142,7 @@ fun ExerciseHomeScreen(
                 ) {
                     Text("눈 운동 리스트", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
 
-                    // [수정 버튼] 클릭 시 운동 변경하기 화면으로 이동
+                    // 클릭 시 운동 변경하기 화면으로 이동
                     Row(
                         modifier = Modifier.clickable {
                             navController.navigate("exercise_list")
@@ -157,9 +156,7 @@ fun ExerciseHomeScreen(
                 }
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // [플레이리스트] LazyRow
                 if (playlist.isEmpty()) {
-                    // 리스트가 비었을 때 안내 문구
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -185,7 +182,7 @@ fun ExerciseHomeScreen(
                                     data = exercise,
                                     badgeColor = badgeYellow,
                                     onRemoveClick = {
-                                        // [삭제] 홈 화면에서 바로 삭제 가능
+                                        // 홈 화면에서 바로 삭제 가능
                                         viewModel.toggleSelection(exercise.id)
                                     }
                                 )
@@ -196,7 +193,7 @@ fun ExerciseHomeScreen(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                // 총 소요시간 (동적 계산)
+                // 총 소요시간
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
                     Text("총 소요시간", fontSize = 14.sp, color = Color.Gray)
                     Text(totalTimeStr, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black)
@@ -211,7 +208,6 @@ fun ExerciseHomeScreen(
                     modifier = Modifier.fillMaxWidth().height(55.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = mainBlue),
-                    // 리스트가 비어있으면 시작 버튼 비활성화 (선택 사항)
                     enabled = playlist.isNotEmpty()
                 ) {
                     Text("운동 시작", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)

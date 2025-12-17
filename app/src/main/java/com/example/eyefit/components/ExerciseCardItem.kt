@@ -92,7 +92,7 @@ fun ExerciseCardItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // [시간 배지] - (Border -> Background -> Padding)
+                // [시간 배지]
                 Box(
                     modifier = Modifier
                         .border(

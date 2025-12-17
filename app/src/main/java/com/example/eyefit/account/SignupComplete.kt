@@ -29,7 +29,7 @@ fun SignupCompleteScreen(navController: NavController) {
             .fillMaxSize()
             .background(backgroundColor)
     ) {
-        // --- 1. 배경 장식 요소 (구름, 해) ---
+        // 1. 배경 장식 요소 (구름, 해)
         // 구름 (왼쪽 위)
         Image(
             painter = painterResource(id = R.drawable.img_cloud), // 구름 이미지 리소스
@@ -50,7 +50,7 @@ fun SignupCompleteScreen(navController: NavController) {
                 .size(50.dp)
         )
 
-        // --- 2. 중앙 콘텐츠 (폭죽, 텍스트, 버튼) ---
+        // 2. 중앙 콘텐츠 (폭죽, 텍스트, 버튼)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,7 +60,7 @@ fun SignupCompleteScreen(navController: NavController) {
         ) {
             // 폭죽 아이콘
             Image(
-                painter = painterResource(id = R.drawable.img_party), // 폭죽 이미지 필요
+                painter = painterResource(id = R.drawable.img_party),
                 contentDescription = "Congratulations",
                 modifier = Modifier.size(180.dp)
             )
@@ -95,7 +95,6 @@ fun SignupCompleteScreen(navController: NavController) {
                 // 시작하기 버튼
                 Button(
                     onClick = {
-                        // 홈으로 이동 + 가입 관련 화면들 스택에서 제거
                         navController.navigate("home") {
                             popUpTo("login") { inclusive = true }
                         }
@@ -115,8 +114,6 @@ fun SignupCompleteScreen(navController: NavController) {
                         fontWeight = FontWeight.Bold
                     )
                 }
-
-                // 토마토 캐릭터 (버튼보다 위에 보여야 하므로 zIndex 높임 or 코드 순서 주의)
                 Image(
                     painter = painterResource(id = R.drawable.right_tomato),
                     contentDescription = null,
@@ -129,7 +126,7 @@ fun SignupCompleteScreen(navController: NavController) {
             }
         }
 
-        // --- 3. 하단 선인장 장식 ---
+        // 3. 하단 선인장 장식
         Image(
             painter = painterResource(id = R.drawable.img_cactus_decor),
             contentDescription = null,
