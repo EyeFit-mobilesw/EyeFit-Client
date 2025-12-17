@@ -22,7 +22,6 @@ fun CharacterWithBackground(
         else -> R.drawable.character_day7
     }
 
-    // 이제 Box 로 wrapping만!
     Box(modifier = modifier) {
         Image(
             painter = painterResource(id = characterRes),

@@ -40,7 +40,7 @@ fun HomeScreen(
 ) {
     val day by viewModel.currentDay.collectAsState()
 
-    // ✅ 오늘 습관 달성 개수 (Firestore에서 items true 개수) 실시간 반영
+    // 오늘 습관 달성 개수 (Firestore에서 items true 개수) 실시간 반영
     val db = remember { FirebaseProvider.db }
     val uid = FirebaseProvider.auth.currentUser?.uid
     val todayKey = remember { LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
@@ -111,7 +111,7 @@ fun HomeScreen(
         }
 
         // ------------------------------
-        // 🔽 아래 스크롤 영역
+        // 아래 스크롤 영역
         // ------------------------------
         Column(
             modifier = Modifier
@@ -234,7 +234,7 @@ private fun JourneyProgress(
     val safeDay = day.coerceIn(1, 7)
     val isEarly = safeDay <= 3
 
-    // ✅ 라벨 윈도우
+
     val labels: List<String> = if (isEarly) {
         (1..6).map { "Day $it" }                 // Day1~Day6
     } else {
@@ -267,8 +267,8 @@ private fun JourneyProgress(
 
             fun centerX(i: Int): Dp = r + spacing * i
 
-            // ✅ 진행 바 끝: 원 중심까지
-            // ✅ Day7이면 도착까지 끝
+            // 진행 바 끝: 원 중심까지
+            // Day7이면 도착까지 끝
             val progressWidth: Dp = if (!isEarly && safeDay == 7) {
                 trackWidth
             } else {

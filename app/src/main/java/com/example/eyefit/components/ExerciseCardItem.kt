@@ -21,15 +21,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.eyefit.data.model.ExerciseUiModel // [중요] 수정된 데이터 모델 Import
+import com.example.eyefit.data.model.ExerciseUiModel
 import com.example.eyefit.R
 
 @Composable
 fun ExerciseCardItem(
     index: Int,
-    data: ExerciseUiModel, // [변경] ExerciseData -> ExerciseUiModel
-    badgeColor: Color = Color(0xFFFFF383), // 기본 노란색
-    onRemoveClick: () -> Unit = {} // [추가] 삭제 버튼 클릭 이벤트
+    data: ExerciseUiModel,
+    badgeColor: Color = Color(0xFFFFF383),
+    onRemoveClick: () -> Unit = {} // 삭제 버튼 클릭 이벤트
 ) {
     Box(
         modifier = Modifier
@@ -45,9 +45,9 @@ fun ExerciseCardItem(
             contentDescription = "Remove",
             tint = Color.LightGray,
             modifier = Modifier
-                .size(18.dp) // 터치 영역 고려하여 아이콘 크기 살짝 조정
+                .size(18.dp)
                 .align(Alignment.TopEnd)
-                .clickable { onRemoveClick() } // [추가] 클릭 시 삭제 동작 수행
+                .clickable { onRemoveClick() } // 클릭 시 삭제 동작 수행
         )
 
         Column(
@@ -92,7 +92,7 @@ fun ExerciseCardItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // [시간 배지] - 테두리 이슈 해결 적용 (Border -> Background -> Padding)
+                // [시간 배지] - (Border -> Background -> Padding)
                 Box(
                     modifier = Modifier
                         .border(
@@ -104,7 +104,6 @@ fun ExerciseCardItem(
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        // [변경] data.time -> data.timeString (새 모델 필드명)
                         text = data.timeString,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
@@ -113,15 +112,13 @@ fun ExerciseCardItem(
                 }
 
                 if (data.isUnlocked) {
-                    // 1. 잠금 해제됨 -> URL 이미지 (Coil 사용)
                     AsyncImage(
                         model = data.imageUrl,
                         contentDescription = null,
-                        modifier = Modifier.size(80.dp), // 크기는 기존대로 설정
+                        modifier = Modifier.size(80.dp),
                         contentScale = ContentScale.Fit
                     )
                 } else {
-                    // 2. 잠김 -> 로컬 자물쇠 아이콘 (기존 방식 유지)
                     Image(
                         painter = painterResource(id = R.drawable.ic_lock),
                         contentDescription = "Locked",
