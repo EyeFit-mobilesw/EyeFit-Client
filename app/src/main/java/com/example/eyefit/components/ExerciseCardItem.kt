@@ -20,7 +20,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.eyefit.data.model.ExerciseUiModel // [중요] 수정된 데이터 모델 Import
+import com.example.eyefit.R
 
 @Composable
 fun ExerciseCardItem(
@@ -110,14 +112,22 @@ fun ExerciseCardItem(
                     )
                 }
 
-                // 이미지
-                Image(
-                    painter = painterResource(id = data.imageResId),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(50.dp) // width/height 대신 size로 통일
-                )
+                if (data.isUnlocked) {
+                    // 1. 잠금 해제됨 -> URL 이미지 (Coil 사용)
+                    AsyncImage(
+                        model = data.imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp), // 크기는 기존대로 설정
+                        contentScale = ContentScale.Fit
+                    )
+                } else {
+                    // 2. 잠김 -> 로컬 자물쇠 아이콘 (기존 방식 유지)
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_lock),
+                        contentDescription = "Locked",
+                        modifier = Modifier.size(80.dp)
+                    )
+                }
             }
         }
     }

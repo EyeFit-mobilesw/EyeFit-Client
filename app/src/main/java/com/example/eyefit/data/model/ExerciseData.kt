@@ -19,9 +19,10 @@ data class ExerciseUiModel(
     val title: String,
     val subTitle: String,
     val timeString: String,
-    val imageResId: Int,
+    val imageUrl: String,
     val isUnlocked: Boolean,
     val isSelected: Boolean = false,
     val descriptionTitle: String = "운동 방법",
-    val descriptionContent: String = ""
+    val descriptionContent: String = "",
+    val animationUrl: String = ""
 )

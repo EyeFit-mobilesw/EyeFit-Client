@@ -52,6 +52,7 @@ import kotlinx.coroutines.delay
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
+import coil.compose.AsyncImage
 
 // 화면 단계 정의
 enum class PlayerStage { INTRO, COUNTDOWN, VIDEO }
@@ -290,10 +291,10 @@ fun ExerciseCountdownView(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Image(
-                    painter = painterResource(id = exercise.imageResId),
+                AsyncImage(
+                    model = exercise.imageUrl,
                     contentDescription = null,
-                    modifier = Modifier.size(250.dp), // 이미지 크기 살짝 조정 (화면 비율 고려)
+                    modifier = Modifier.size(250.dp),
                     contentScale = ContentScale.Fit
                 )
 
@@ -365,9 +366,11 @@ fun ExerciseVideoView(
     var isVideoEnded by remember { mutableStateOf(false) }
 
     // ExoPlayer 설정 (기존 동일)
-    val exoPlayer = remember {
+    val exoPlayer = remember(exercise.animationUrl) {
         ExoPlayer.Builder(context).build().apply {
-            val videoUri = Uri.parse("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+            // [수정 핵심] 하드코딩된 주소 -> exercise 객체의 URL 사용
+            val videoUri = Uri.parse(exercise.animationUrl)
+
             setMediaItem(MediaItem.fromUri(videoUri))
             prepare()
             playWhenReady = true

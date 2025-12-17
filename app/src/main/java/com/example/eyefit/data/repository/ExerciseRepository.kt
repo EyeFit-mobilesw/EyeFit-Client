@@ -117,19 +117,25 @@ object ExerciseRepository {
                 "%d분 %02d초".format(exercise.time / 60, exercise.time % 60)
             } else ""
 
-            // 리소스 ID 매핑
-            val imgRes = if (isUnlocked) getDrawableIdByName(exercise.imageUrl) else R.drawable.ic_lock
+            // [핵심 변경]
+            // 1. 잠금 상태면 URL을 빈 문자열("")로 설정 (UI에서 자물쇠 아이콘 표시)
+            // 2. 해금 상태면 DB에 있는 URL(exercise.imageUrl) 사용
+            val displayImageUrl = if (isUnlocked) exercise.imageUrl else ""
 
             ExerciseUiModel(
                 id = exercise.id,
                 title = displayTitle,
                 subTitle = displaySubTitle,
                 timeString = displayTimeStr,
-                imageResId = imgRes,
+
+                // [변경] 리소스 ID 대신 URL 전달
+                imageUrl = displayImageUrl,
+
                 isUnlocked = isUnlocked,
                 isSelected = isSelected,
-                descriptionTitle = exercise.description, // DB에 필드가 있다면 exercise.description 사용
-                descriptionContent = if(isUnlocked) exercise.detailedDescription else ""
+                descriptionTitle = exercise.description,
+                descriptionContent = if (isUnlocked) exercise.detailedDescription else "",
+                animationUrl = exercise.animationUrl
             )
         }
         _uiListFlow.value = newList
@@ -198,28 +204,5 @@ object ExerciseRepository {
 
     // --- Helper: 초기 데이터 업로드 ---
     private fun uploadInitialData() {
-        Log.d("Repo", "초기 운동 데이터 업로드 시작")
-        val initialData = listOf(
-            ExerciseEntity(1, "8자 그리기 운동", "눈 혈액순환 개선", "눈을 크게 뜨고 8자를 그려보세요.", "", 420, "img_infinity", ""),
-            ExerciseEntity(2, "눈 깜빡이기 운동", "안구건조 완화", "4초에 한 번씩 눈을 깜빡이세요.", "", 420, "img_blink", ""),
-            ExerciseEntity(3, "눈 근육 스트레칭", "홍채 근육 단련", "위 아래 왼쪽 오른쪽을 끝까지 보세요.", "", 120, "img_stretch", ""),
-            ExerciseEntity(4, "눈 콧등 마사지", "눈 피로도 개선", "엄지와 검지로 코 양옆을 눌러주세요.", "", 90, "img_massage", ""),
-            ExerciseEntity(5, "X자 그리기 운동", "시력 개선 도움", "대각선 방향으로 눈을 움직이세요.", "", 150, "img_x_shape", ""),
-            ExerciseEntity(6, "매직 아이 운동", "집중력 향상 최고", "화면 너머를 응시하세요.", "", 180, "img_infinity", "")
-        )
-        initialData.forEach {
-            db.collection("exercises").document(it.id.toString()).set(it)
-        }
-    }
-
-    private fun getDrawableIdByName(name: String): Int {
-        return when(name) {
-            "img_infinity" -> R.drawable.img_infinity
-            "img_blink" -> R.drawable.img_blink
-            "img_stretch" -> R.drawable.img_massage
-            "img_massage" -> R.drawable.img_massage
-            "img_x_shape" -> R.drawable.img_x_shape
-            else -> R.drawable.ic_lock
-        }
     }
 }
