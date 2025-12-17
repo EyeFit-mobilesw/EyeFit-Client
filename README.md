@@ -44,5 +44,5 @@ EyeFit은 장시간 디지털 기기 사용으로 인한 눈의 피로·건조�
 
 | 이름     | 개발분야  | 개인 레포                                         | 역할                    |
 | -------- | --------- | ------------------------------------------------- | ------------------------- |
-| 🦁이현정 | Back-end | [hyhy-j](https://github.com/hyhy-j)  | 운동 |
-| 🦁서문지 | Back-end | [SEOMUNJI](https://github.com/SEOMUNJI)  | ㅇㄴ |
+| 👀 이현정 | Back-end | [hyhy-j](https://github.com/hyhy-j)  | 운동 |
+| 👀 서문지 | Back-end | [SEOMUNJI](https://github.com/SEOMUNJI)  | ㅇㄴ |
