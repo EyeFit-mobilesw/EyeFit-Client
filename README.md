@@ -67,5 +67,5 @@
 
 | 이름     | 개발분야  | 개인 레포                                         | 역할                    |
 | -------- | --------- | ------------------------------------------------- | ------------------------- |
-| 👀이현정 | PM, Front-end, Back-end | [hyhy-j](https://github.com/hyhy-j)  | UI/UX 디자인, 온보딩/로그인/회원가입/운동 리스트 및 플레이 관련 페이지 프론트엔드 구현, Firebase 연동(Auth/Firestore) 및 데이터 저장·조회 처리, 보고서 작성, 발표자료 제작 |
-| 👀서문지 | PM, Front-end, Back-end | [SEOMUNJI](https://github.com/SEOMUNJI)  | UI/UX 디자인, 홈(메인) 화면 및 하루 습관 체크·분석 페이지 프론트엔드 구현, Firebase 연동(Auth/Firestore) 및 데이터 저장·조회 처리, 보고서 작성, 발표자료 제작 |
+| 👀이현정 | PM, Front-end, Back-end | [hyhy-j](https://github.com/hyhy-j)  | UI/UX 구성 및 디자인, 온보딩/로그인/회원가입/운동 리스트 및 플레이 관련 페이지 프론트엔드 구현, Firebase 연동(Auth/Firestore) 및 데이터 저장·조회 처리, 보고서 작성, 발표자료 제작 |
+| 👀서문지 | PM, Front-end, Back-end | [SEOMUNJI](https://github.com/SEOMUNJI)  | UI/UX 구성 및 디자인, 홈(메인) 화면 및 하루 습관 체크·분석 페이지 프론트엔드 구현, Firebase 연동(Auth/Firestore) 및 데이터 저장·조회 처리, 보고서 작성, 발표자료 제작 |
