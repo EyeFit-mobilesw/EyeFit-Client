@@ -1,6 +1,5 @@
 package com.example.eyefit.exercise
 
-import android.R.attr.fontWeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,8 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -28,8 +25,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.eyefit.R
-import com.example.eyefit.components.ExerciseListItem // 분리한 컴포넌트 Import
-import com.example.eyefit.data.repository.ExerciseRepository.userPoints
+import com.example.eyefit.components.ExerciseListItem
 
 @Composable
 fun ExerciseListScreen(
@@ -41,7 +37,7 @@ fun ExerciseListScreen(
     val unlockTarget by viewModel.selectedExerciseToUnlock.collectAsState()
     val mainBlue = Color(0xFF2CCEF3)
 
-    // [팝업 표시 로직] target이 null이 아니면 Dialog를 띄움
+    // 팝업 표시 - target이 null이 아니면 Dialog를 띄움
     if (unlockTarget != null) {
         UnlockDialog(
             exerciseTitle = unlockTarget!!.title,
@@ -49,16 +45,16 @@ fun ExerciseListScreen(
             requiredPoints = 100,
             onDismiss = { viewModel.dismissDialog() },
             onUnlockClick = { viewModel.unlockExercise() },
-            onAdClick = { /* 광고 보기 로직 */ }
+            onAdClick = {}
         )
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF9F9F9)) // 배경색 (살짝 회색)
+            .background(Color(0xFFF9F9F9))
     ) {
-        // --- 1. 상단바 ---
+        //  1. 상단바
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,7 +78,7 @@ fun ExerciseListScreen(
             )
         }
 
-        // --- 2. 포인트 표시 ---
+        // 2. 포인트 표시
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,7 +86,6 @@ fun ExerciseListScreen(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 코인 아이콘 (필요시 이미지로 교체)
             Text(text = "🪙 ", fontSize = 16.sp)
             Text(
                 text = "보유 포인트 : ${userPoints}p",
@@ -102,7 +97,7 @@ fun ExerciseListScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // --- 3. 운동 리스트 ---
+        // 3. 운동 리스트
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
@@ -118,11 +113,11 @@ fun ExerciseListScreen(
             }
         }
 
-        // --- 4. 추가하기 버튼 ---
+        // 4. 추가하기 버튼
         Button(
             onClick = {
-                viewModel.savePlaylist() // 저장
-                navController.popBackStack() // 완료 후 뒤로가기
+                viewModel.savePlaylist()
+                navController.popBackStack()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,7 +136,7 @@ fun ExerciseListScreen(
     }
 }
 
-// [신규] 잠금 해제 팝업 컴포저블
+// 잠금 해제 팝업
 @Composable
 fun UnlockDialog(
     exerciseTitle: String,
@@ -152,9 +147,6 @@ fun UnlockDialog(
     onAdClick: () -> Unit
 ) {
     val isInsufficient = currentPoints < requiredPoints
-
-    // 디자인 색상 정의
-    // 그라데이션 브러시 정의 (2CCEF3 -> 88DEF2)
     val gradientBrush = Brush.horizontalGradient(
         colors = listOf(
             Color(0xFF2CCEF3),
@@ -162,8 +154,8 @@ fun UnlockDialog(
         )
     )
     val warningRed = Color(0xFFFF5252) // 경고 문구 빨간색
-    val adButtonBg = Color(0xFF424242).copy(alpha = 0.8f) // 광고 버튼 배경 (어두운 회색)
-    val adButtonBorder = Color(0xFF2CCEF3) // 광고 버튼 테두리용 (기존 mainBlue)
+    val adButtonBg = Color(0xFF424242).copy(alpha = 0.8f) // 광고 버튼 배경
+    val adButtonBorder = Color(0xFF2CCEF3) // 광고 버튼 테두리용
 
     Dialog(onDismissRequest = onDismiss) {
         // 흰색 Card 배경을 제거하고, 투명한 Column 사용
@@ -174,7 +166,7 @@ fun UnlockDialog(
                 .padding(horizontal = 10.dp) // 좌우 여백
         ) {
 
-            // [1] 포인트 부족 경고 메시지 (부족할 때만 표시)
+            // 포인트 부족 경고 메시지 (부족할 때만 표시)
             if (isInsufficient) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -198,10 +190,10 @@ fun UnlockDialog(
                 }
             }
 
-            // [2] 포인트 결제 버튼 (하늘색)
+            // 포인트 결제 버튼
             Button(
                 onClick = { if (!isInsufficient) onUnlockClick() },
-                enabled = true, // 디자인 유지를 위해 클릭은 되게 하되 로직에서 막음
+                enabled = true,
                 shape = RoundedCornerShape(30.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
@@ -225,8 +217,6 @@ fun UnlockDialog(
                     ) {
                         // 아이콘 + 100p
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            // 코인 아이콘 (이미지 리소스가 있다면 교체 추천)
-                            // Icon(painter = painterResource(R.drawable.ic_coin), ...)
                             Text(text = "🪙", fontSize = 20.sp) // 임시 이모지
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
@@ -248,14 +238,14 @@ fun UnlockDialog(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // [3] 광고 보고 잠금 해제 버튼 (어두운 배경 + 테두리)
+            // 광고 보고 잠금 해제 버튼
             Button(
                 onClick = onAdClick,
                 shape = RoundedCornerShape(30.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = adButtonBg
                 ),
-                border = androidx.compose.foundation.BorderStroke(2.dp, adButtonBorder), // 하늘색 테두리
+                border = androidx.compose.foundation.BorderStroke(2.dp, adButtonBorder),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)

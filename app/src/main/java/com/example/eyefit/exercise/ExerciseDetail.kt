@@ -1,6 +1,5 @@
 package com.example.eyefit.exercise
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,21 +34,19 @@ fun ExerciseDetailScreen(
     exerciseId: Int, // 네비게이션 인자
     viewModel: ExerciseDetailViewModel = viewModel() // 뷰모델 주입
 ) {
-    // 1. 화면 진입 시 데이터 로드 요청
+    // 화면 진입 시 데이터 로드 요청
     LaunchedEffect(exerciseId) {
         viewModel.loadExercise(exerciseId.toLong())
     }
 
-    // 2. 데이터 관찰
     val uiState by viewModel.exerciseState.collectAsState()
 
-    // 데이터가 로드되기 전(null)이면 빈 화면이나 로딩바 표시
+    // 데이터가 로드되기 전이면 빈 화면이나 로딩바 표시
     if (uiState == null) {
         Box(modifier = Modifier.fillMaxSize().background(Color.White))
         return
     }
 
-    // 데이터가 로드되면 data 변수에 할당 (null이 아님을 보장)
     val data = uiState!!
 
     val mainBlue = Color(0xFF5CC1F0)
@@ -62,7 +59,7 @@ fun ExerciseDetailScreen(
             .background(Color.White)
             .verticalScroll(rememberScrollState())
     ) {
-        // --- 1. 상단바 (뒤로가기) ---
+        // 1. 상단바 (뒤로가기)
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -82,7 +79,7 @@ fun ExerciseDetailScreen(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // --- 2. 타이틀 & 시간 배지 ---
+            // 2. 타이틀 & 시간 배지
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -104,7 +101,7 @@ fun ExerciseDetailScreen(
                     )
                 }
 
-                // 시간 배지 (노란색) - 테두리 문제 수정 적용됨
+                // 시간 배지 (노란색)
                 Box(
                     modifier = Modifier
                         .border(
@@ -116,7 +113,6 @@ fun ExerciseDetailScreen(
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        // [수정] data.time -> data.timeString
                         text = data.timeString,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
@@ -127,7 +123,7 @@ fun ExerciseDetailScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // --- 3. 운동 이미지 ---
+            // 3. 운동 이미지
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -135,7 +131,7 @@ fun ExerciseDetailScreen(
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = data.imageUrl, // String 타입의 URL 사용
+                    model = data.imageUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize()
@@ -144,9 +140,9 @@ fun ExerciseDetailScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // --- 4. 효과 버튼 ---
+            // 4. 효과 버튼
             Button(
-                onClick = { /* 효과 팝업 등 */ },
+                onClick = {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
@@ -163,9 +159,8 @@ fun ExerciseDetailScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // --- 5. 설명 섹션 (동적 데이터) ---
+            // 5. 설명 섹션 (동적 데이터)
             Text(
-                // [수정] 모델에 추가한 필드 사용
                 text = data.descriptionTitle,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -173,7 +168,6 @@ fun ExerciseDetailScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                // [수정] 모델에 추가한 필드 사용
                 text = data.descriptionContent,
                 fontSize = 15.sp,
                 color = grayText,
@@ -182,7 +176,7 @@ fun ExerciseDetailScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // --- 6. 참고사항 (고정 텍스트) ---
+            // 6. 참고사항 (고정 텍스트)
             Text(
                 text = "참고해주세요!",
                 fontSize = 20.sp,

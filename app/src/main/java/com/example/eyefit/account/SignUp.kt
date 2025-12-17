@@ -51,9 +51,7 @@ fun SignupScreen(navController: NavController) {
     var passwordText by remember { mutableStateOf("") }
     var passwordCheckText by remember { mutableStateOf("") }
 
-    // [추가됨] 모든 필드가 채워졌는지 확인하는 변수
-    // isNotEmpty()는 빈 문자열이 아닐 때 true를 반환합니다.
-    // 공백(스페이스바)도 입력으로 치지 않으려면 isNotBlank()를 사용하세요.
+    // 모든 필드가 채워졌는지 확인하는 변수
     val isFormValid = emailText.isNotEmpty() &&
             idText.isNotEmpty() &&
             passwordText.isNotEmpty() &&
@@ -71,7 +69,7 @@ fun SignupScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(horizontal = 40.dp, vertical = 30.dp)
         ) {
-            // --- 상단 바 ---
+            // 상단 바
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -96,7 +94,7 @@ fun SignupScreen(navController: NavController) {
                 )
             }
 
-            // --- 입력 폼 ---
+            // 입력 폼
 
             // 1. 이메일
             LabelText("이메일")
@@ -137,7 +135,7 @@ fun SignupScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(50.dp))
 
-            // --- 회원가입 버튼 ---
+            // 회원가입 버튼
             Button(
                 onClick = {
                     scope.launch {
@@ -185,7 +183,7 @@ fun SignupScreen(navController: NavController) {
                         }
                     }
                 },
-                // [수정됨] 유효성 검사 결과에 따라 버튼 활성/비활성 결정
+                // 유효성 검사 결과에 따라 버튼 활성/비활성 결정
                 enabled = isFormValid && !loading,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -193,7 +191,7 @@ fun SignupScreen(navController: NavController) {
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = mainColor, // 활성 상태일 때 배경색
-                    disabledContainerColor = disabledColor, // [추가됨] 비활성 상태일 때 배경색 (회색)
+                    disabledContainerColor = disabledColor, // 비활성 상태일 때 배경색 (회색)
                     contentColor = Color.White,
                     disabledContentColor = Color.White
                 )
@@ -224,9 +222,6 @@ fun SignupScreen(navController: NavController) {
         )
     }
 }
-
-// (아래 LabelText, SignupTextField 컴포넌트는 기존과 동일하므로 생략 가능하지만,
-// 복사 붙여넣기 편의를 위해 그대로 둡니다.)
 
 @Composable
 fun LabelText(text: String) {

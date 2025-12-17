@@ -28,7 +28,6 @@ import androidx.navigation.NavController
 import com.example.eyefit.data.firebase.FirebaseProvider
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-// import com.example.eyefit.pixelFont // 패키지 구조에 따라 import 필요 여부가 다를 수 있음
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -57,7 +56,7 @@ fun LoginScreen(navController: NavController) {
     var idText by remember { mutableStateOf("") }
     var passwordText by remember { mutableStateOf("") }
 
-    // [추가됨] 두 필드가 모두 채워졌는지 확인 (공백 제외하려면 isNotBlank 사용)
+    // 두 필드가 모두 채워졌는지 확인
     val isLoginValid = idText.isNotEmpty() && passwordText.isNotEmpty()
 
     Box(
@@ -94,8 +93,6 @@ fun LoginScreen(navController: NavController) {
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.align(Alignment.BottomStart).padding(bottom = 8.dp)
                 )
-
-                // [수정됨] 토마토 캐릭터 이미지 변경 (running_tomato -> left_tomato)
                 Image(
                     painter = painterResource(id = R.drawable.left_tomato),
                     contentDescription = null,
@@ -171,7 +168,7 @@ fun LoginScreen(navController: NavController) {
                         }
                     }
                 },
-                // [수정됨] 유효성 검사 결과에 따라 활성/비활성
+                // 유효성 검사 결과에 따라 활성/비활성
                 enabled = isLoginValid && !loading,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -230,8 +227,6 @@ fun LoginScreen(navController: NavController) {
         )
     }
 }
-
-// CustomTextField는 변경사항이 없어 그대로 사용하시면 됩니다.
 @Composable
 fun CustomTextField(
     value: String,

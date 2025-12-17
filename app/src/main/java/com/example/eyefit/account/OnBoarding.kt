@@ -1,7 +1,5 @@
 package com.example.eyefit
 
-import android.R.attr.fontWeight
-import android.R.attr.x
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -39,7 +37,7 @@ fun OnBoardingScreen(onTimeout: () -> Unit) {
     // 3초 타이머 로직
     LaunchedEffect(Unit) {
         delay(3000) // 3초 대기
-        onTimeout() // MainActivity에 "이동해!"라고 신호 보냄
+        onTimeout()
     }
 
     Box(

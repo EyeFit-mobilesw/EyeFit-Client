@@ -1,7 +1,6 @@
 package com.example.eyefit.data.model
 
-// [Entity 1] 운동 마스터 데이터 (DB: Exercise 테이블)
-// [중요] Firestore용 빈 생성자를 위해 모든 필드에 초기값을 줍니다.
+// 운동 마스터 데이터 (DB: Exercise 테이블)
 data class ExerciseEntity(
     val id: Long = 0L,
     val title: String = "",
@@ -13,7 +12,7 @@ data class ExerciseEntity(
     val animationUrl: String = ""
 )
 
-// [UI Model] (변경 없음)
+// UI Model
 data class ExerciseUiModel(
     val id: Long,
     val title: String,

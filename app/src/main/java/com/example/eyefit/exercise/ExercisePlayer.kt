@@ -1,10 +1,8 @@
 package com.example.eyefit.exercise
 
-import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.util.Log
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
 import androidx.compose.foundation.Image
@@ -14,9 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
@@ -25,7 +21,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -44,10 +39,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
-import com.example.eyefit.data.util.LockScreenOrientation// 위에서 만든 유틸리티 import
+import com.example.eyefit.data.util.LockScreenOrientation
 import com.example.eyefit.R
 import com.example.eyefit.data.model.ExerciseUiModel
-import com.example.eyefit.data.util.LockScreenOrientation
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clipToBounds
@@ -70,13 +64,13 @@ fun ExercisePlayerScreen(
     // 현재 보여줄 화면 단계 (인트로 -> 카운트다운 -> 비디오)
     var currentStage by rememberSaveable { mutableStateOf(PlayerStage.INTRO) }
 
-    // [추가] 완료 팝업 표시 여부 상태
+    // 완료 팝업 표시 여부 상태
     var showCompletionPopup by rememberSaveable { mutableStateOf(false) }
 
     // 모든 운동이 끝났는지 확인
     if (playlist.isEmpty() || currentIndex >= playlist.size) {
         LaunchedEffect(Unit) {
-            navController.popBackStack() // 혹은 결과 화면으로 이동
+            navController.popBackStack()
         }
         return
     }
@@ -85,7 +79,6 @@ fun ExercisePlayerScreen(
     val isLastExercise = currentIndex == playlist.size - 1
 
     // 단계별 화면 교체 로직
-    // 전체 화면을 Box로 감싸서 팝업을 위에 띄울 수 있게 함
     Box(modifier = Modifier.fillMaxSize()) {
 
         // 1. 기존 화면 내용 (인트로 -> 카운트다운 -> 비디오)
@@ -117,10 +110,10 @@ fun ExercisePlayerScreen(
                             currentIndex++
                             currentStage = PlayerStage.INTRO
                         } else {
-                            // [수정] 마지막 운동이면 팝업 띄우기 (바로 나가지 않음)
+                            // 마지막 운동이면 팝업 띄우기
                             showCompletionPopup = true
 
-                            // [로직] 포인트 10p 적립
+                            // 포인트 10p 적립
                             viewModel.addPoints(10)
                         }
                     }
@@ -128,7 +121,7 @@ fun ExercisePlayerScreen(
             }
         }
 
-        // 2. 완료 팝업 (showCompletionPopup이 true일 때만 표시)
+        // 2. 완료 팝업
         if (showCompletionPopup) {
             CompletionPopup(
                 onClose = {
@@ -140,21 +133,20 @@ fun ExercisePlayerScreen(
     }
 }
 
-// --- 1. 인트로 화면 (설명 + 토마토) ---
+// 1. 인트로 화면
 @Composable
 fun ExerciseIntroView(
     exercise: ExerciseUiModel,
     onNextClick: () -> Unit,
-    onBackClick: () -> Unit // 뒤로가기 버튼 클릭 시 동작할 함수 추가
+    onBackClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White) // 배경색 흰색으로 변경
+            .background(Color.White)
             .padding(start = 21.dp, top = 70.dp, end = 21.dp, bottom = 70.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 상단 바 (뒤로가기 버튼 + 타이틀)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -164,12 +156,12 @@ fun ExerciseIntroView(
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_back),
                 contentDescription = "Back",
-                tint = Color(0xFF222222), // 짙은 회색
+                tint = Color(0xFF222222),
                 modifier = Modifier
                     .size(28.dp)
-                    .clickable { onBackClick() } // 뒤로가기 동작 연결
+                    .clickable { onBackClick() }
             )
-            Spacer(modifier = Modifier.weight(1f)) // 타이틀을 중앙으로 밀어내기 위한 Spacer
+            Spacer(modifier = Modifier.weight(1f))
         }
 
         // 타이틀 및 서브타이틀
@@ -187,7 +179,7 @@ fun ExerciseIntroView(
             color = Color(color = 0xFF222222)
         )
 
-        Spacer(modifier = Modifier.height(60.dp)) // 이미지와 타이틀 사이 여백
+        Spacer(modifier = Modifier.height(60.dp))
 
         // 토마토 캐릭터 이미지
         Image(
@@ -196,7 +188,7 @@ fun ExerciseIntroView(
             modifier = Modifier.size(280.dp)
         )
 
-        Spacer(modifier = Modifier.height(50.dp)) // 이미지와 설명 텍스트 사이 여백
+        Spacer(modifier = Modifier.height(50.dp))
 
         // 설명 텍스트
         Text(
@@ -207,38 +199,38 @@ fun ExerciseIntroView(
             lineHeight = 24.sp
         )
 
-        Spacer(modifier = Modifier.weight(1f)) // 하단 버튼을 아래로 밀어내기 위한 Spacer
+        Spacer(modifier = Modifier.weight(1f))
 
-        // 하단 다음 버튼 (우측 하단 배치)
+        // 하단 다음 버튼
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End // 우측 정렬
+            horizontalArrangement = Arrangement.End
         ) {
             IconButton(
                 onClick = onNextClick,
                 modifier = Modifier
                     .size(60.dp)
-                    .background(Color(0xFF2CCEF3), CircleShape) // 파란색 배경
+                    .background(Color(0xFF2CCEF3), CircleShape)
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward, // 앞으로 가기 아이콘
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Next",
                     tint = Color.White
                 )
             }
         }
-        Spacer(modifier = Modifier.height(20.dp)) // 하단 여백
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
-// --- 2. 카운트다운 화면 (3, 2, 1) ---
+// 2. 카운트다운 화면
 @Composable
 fun ExerciseCountdownView(
     exercise: ExerciseUiModel,
     onFinishCountdown: () -> Unit,
-    onBackClick: () -> Unit // [추가됨] 뒤로가기 이벤트
+    onBackClick: () -> Unit
 ) {
-    var count by remember { mutableIntStateOf(5) } // 3초가 일반적이지만 5초 원하시면 5로 변경
+    var count by remember { mutableIntStateOf(5) }
 
     // 1초마다 카운트 다운
     LaunchedEffect(Unit) {
@@ -253,7 +245,6 @@ fun ExerciseCountdownView(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // --- 상단 흰색 영역 (Box로 변경하여 겹치기 허용) ---
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -261,20 +252,19 @@ fun ExerciseCountdownView(
                 .background(Color(0xFFF9F9F9))
                 .padding(start = 21.dp, top = 70.dp)
         ) {
-            // 1. 뒤로가기 버튼 (좌측 상단 고정)
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_back),
                 contentDescription = "Back",
                 tint = Color(0xFF222222),
                 modifier = Modifier
                     .size(28.dp)
-                    .align(Alignment.TopStart) // 좌측 상단 배치
+                    .align(Alignment.TopStart)
                     .clickable { onBackClick() }
             )
 
-            // 2. 중앙 컨텐츠 (STEP, 이미지, 텍스트)
+            // 중앙 컨텐츠 (STEP, 이미지, 텍스트)
             Column(
-                modifier = Modifier.align(Alignment.Center), // 박스 정중앙 배치
+                modifier = Modifier.align(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -315,16 +305,15 @@ fun ExerciseCountdownView(
             }
         }
 
-        // --- 하단 파란색 영역 (카운트다운) ---
+        // 하단 파란색 영역 (카운트다운)
         Box(
             modifier = Modifier
                 .weight(0.6f)
                 .fillMaxWidth()
-                .background(Color(0xFF2CCEF3)), // mainBlue
+                .background(Color(0xFF2CCEF3)),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // 카운트다운 숫자
                 Text(
                     text = count.toString(),
                     fontSize = 100.sp,
@@ -334,7 +323,6 @@ fun ExerciseCountdownView(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // "자 그럼 시작합니다!" 뱃지
                 Box(
                     modifier = Modifier
                         .background(Color(0xFFFFF383), RoundedCornerShape(30.dp))
@@ -352,7 +340,7 @@ fun ExerciseCountdownView(
     }
 }
 
-// --- 3. 비디오 재생 화면 (가로 모드) ---
+//3. 비디오 재생 화면 (가로 모드)
 @OptIn(UnstableApi::class)
 @Composable
 fun ExerciseVideoView(
@@ -362,13 +350,12 @@ fun ExerciseVideoView(
 ) {
     val context = LocalContext.current
 
-    // [상태 추가] 영상이 끝났는지 여부
+    // [영상이 끝났는지 여부
     var isVideoEnded by remember { mutableStateOf(false) }
 
-    // ExoPlayer 설정 (기존 동일)
+    // ExoPlayer 설정
     val exoPlayer = remember(exercise.animationUrl) {
         ExoPlayer.Builder(context).build().apply {
-            // [수정 핵심] 하드코딩된 주소 -> exercise 객체의 URL 사용
             val videoUri = Uri.parse(exercise.animationUrl)
 
             setMediaItem(MediaItem.fromUri(videoUri))
@@ -377,7 +364,7 @@ fun ExerciseVideoView(
         }
     }
 
-    // 리스너 설정 (기존 동일)
+    // 리스너 설정
     DisposableEffect(exoPlayer) {
         val listener = object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -397,7 +384,7 @@ fun ExerciseVideoView(
         }
     }
 
-    // UI 상태 관리 (기존 동일)
+    // UI 상태 관리
     var isPlaying by remember { mutableStateOf(true) }
     var currentPosition by remember { mutableLongStateOf(0L) }
     var duration by remember { mutableLongStateOf(0L) }
@@ -410,14 +397,14 @@ fun ExerciseVideoView(
         }
     }
 
-    // --- UI 레이아웃 ---
+    // UI 레이아웃
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            // 1. 좌측 가이드 영역 (TIP) - 기존 유지
+            // 좌측 가이드 영역 (TIP)
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -442,15 +429,15 @@ fun ExerciseVideoView(
                 )
             }
 
-            // 2. 우측 비디오 영역
+            // 우측 비디오 영역
             Box(
                 modifier = Modifier
                     .weight(2.5f)
                     .fillMaxHeight()
-                    .clipToBounds() // 혹시 모를 넘침 방지
-                    .background(Color.Black) // 영상 비율이 안 맞을 때 보일 배경색
+                    .clipToBounds()
+                    .background(Color.Black)
             ) {
-                // 2-1. 비디오 뷰 (배경)
+                // 비디오 뷰
                 AndroidView(
                     factory = { ctx ->
                         PlayerView(ctx).apply {
@@ -464,21 +451,15 @@ fun ExerciseVideoView(
                         (view.layoutParams as? FrameLayout.LayoutParams)?.gravity = android.view.Gravity.CENTER
                     }
                 )
-
-                // 2-2. 오버레이 UI (컨트롤러만 남김)
-                // [수정] Column -> Box로 변경하여 정렬 제어
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(20.dp)
                 ) {
-                    // [삭제됨] 중앙 텍스트 Box 제거
-
-                    // 하단 컨트롤러 Row
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .align(Alignment.BottomCenter), // [수정] 하단 중앙 정렬
+                            .align(Alignment.BottomCenter),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
@@ -514,7 +495,7 @@ fun ExerciseVideoView(
                             )
                         )
 
-                        // [핵심 로직] 영상이 끝났을 때만 버튼 표시
+                        // 영상이 끝났을 때만 버튼 표시
                         if (isVideoEnded) {
                             Spacer(modifier = Modifier.width(10.dp))
 
@@ -539,17 +520,16 @@ fun ExerciseVideoView(
     }
 }
 
-// [신규] 완료 팝업 컴포저블
+// 완료 팝업 컴포저블
 @Composable
 fun CompletionPopup(onClose: () -> Unit) {
-    // 배경을 반투명 검정으로 덮음 (Dialog 대신 Box로 오버레이)
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.8f)) // 배경 어둡게
-            .clickable(enabled = false) {} // 뒷배경 클릭 방지
+            .background(Color.Black.copy(alpha = 0.8f))
+            .clickable(enabled = false) {}
     ) {
-        // 1. 우측 상단 닫기(X) 버튼
+        // 우측 상단 닫기(X) 버튼
         Icon(
             imageVector = Icons.Default.Close,
             contentDescription = "Close",
@@ -561,28 +541,26 @@ fun CompletionPopup(onClose: () -> Unit) {
                 .clickable { onClose() }
         )
 
-        // 2. 중앙 적립 메시지 뱃지
+        // 중앙 적립 메시지 뱃지
         Box(
             modifier = Modifier
                 .align(Alignment.Center)
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF2CCEF3), Color(0xFF88DEF2)) // 하늘색 그라데이션
+                        colors = listOf(Color(0xFF2CCEF3), Color(0xFF88DEF2))
                     ),
                     shape = RoundedCornerShape(30.dp)
                 )
                 .padding(horizontal = 32.dp, vertical = 16.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // 체크 아이콘
                 Icon(
-                    imageVector = Icons.Default.CheckCircle, // 혹은 유사한 체크 아이콘
+                    imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                // 텍스트
                 Text(
                     text = "10p 적립되었습니다",
                     color = Color.White,
