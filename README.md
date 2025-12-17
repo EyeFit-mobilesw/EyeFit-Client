@@ -65,5 +65,5 @@
 
 | 이름     | 개발분야  | 개인 레포                                         | 역할                    |
 | -------- | --------- | ------------------------------------------------- | ------------------------- |
-| 👀 이현정 | PM, Front-end, Back-end | [hyhy-j](https://github.com/hyhy-j)  | 운동 |
-| 👀 서문지 | PM, Front-end, Back-end | [SEOMUNJI](https://github.com/SEOMUNJI)  | ㅇㄴ |
+| 👀 이현정 | PM, Front-end, Back-end | [hyhy-j](https://github.com/hyhy-j)  | UI/UX 디자인, 홈 화면 및 하루 습관 체크 및 분석 페이지 프론트엔드 구현 및 파이어베이스 연동, 보고서 작성, 발표자료 제작 |
+| 👀 서문지 | PM, Front-end, Back-end | [SEOMUNJI](https://github.com/SEOMUNJI)  | UI/UX 디자인,  페이지 프론트엔드 구현 및 파이어베이스 연동, 보고서 작성, 발표자료 제작 |
