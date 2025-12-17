@@ -75,4 +75,6 @@ dependencies {
     implementation("androidx.media3:media3-common:1.2.0")
 
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }

@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.eyefit.R
-// import com.example.eyefit.data.model.exerciseList // 더 이상 사용하지 않음
 
 @Composable
 fun ExerciseDetailScreen(
@@ -134,8 +134,8 @@ fun ExerciseDetailScreen(
                     .height(200.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(id = data.imageResId),
+                AsyncImage(
+                    model = data.imageUrl, // String 타입의 URL 사용
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize()
