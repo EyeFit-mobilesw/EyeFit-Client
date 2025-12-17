@@ -52,11 +52,10 @@ fun ExerciseListItem(
                 .background(Color(0xFFF5F5F5), RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
-            // [수정됨] 잠금 상태에 따라 다른 이미지 표시
             if (data.isUnlocked) {
                 // 1) 잠금 해제됨 -> URL 이미지 (Coil 사용)
                 AsyncImage(
-                    model = data.imageUrl, // String 타입의 URL
+                    model = data.imageUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.size(32.dp)
@@ -64,7 +63,7 @@ fun ExerciseListItem(
             } else {
                 // 2) 잠김 -> 로컬 자물쇠 아이콘
                 Image(
-                    painter = painterResource(id = R.drawable.ic_lock), // R Import 필요
+                    painter = painterResource(id = R.drawable.ic_lock),
                     contentDescription = "Locked",
                     modifier = Modifier.size(32.dp)
                 )
@@ -105,7 +104,6 @@ fun ExerciseListItem(
                 )
             }
         } else {
-            // 잠금 상태일 때 자물쇠 아이콘 (필요시 추가)
         }
     }
 }
