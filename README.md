@@ -3,8 +3,7 @@
 # 👀 EyeFit
 <img width="5760" height="3240" alt="표지" src="https://github.com/user-attachments/assets/f454b15a-49ee-4480-9cb2-e215f6cff95c" />
 
-## 🚀 Project Introduction
-> **EyeFit**  
+## 🚀 Project Introduction 
 EyeFit은 장시간 디지털 기기 사용으로 인한 눈의 피로·건조함·시력 저하를 완화하고, 하루 한 번 눈 운동을 쉽고 재미있게 습관화하도록 돕는 모바일 헬스케어 앱입니다. 
 눈 운동을 ‘사막 → 오아시스’ 여정으로 스토리텔링해 캐릭터/애니메이션 기반 루틴을 제공하고, 기록·주간 통계로 성취감을 시각화합니다. 
 
