@@ -4,7 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -69,6 +71,8 @@ fun DailyHabitCheckScreen(
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var didLoadOnce by remember { mutableStateOf(false) }
 
+    val scrollState = rememberScrollState()
+
     /** ---------------------------
      *  화면 진입 시: 오늘 기록 Firestore에서 불러오기
      *  users/{uid}/habitChecks/{dateKey}
@@ -97,7 +101,6 @@ fun DailyHabitCheckScreen(
                 originalHabitStates = loaded
                 habitStates = loaded
             } else {
-                // 오늘 문서가 아직 없으면 all false 유지
                 originalHabitStates = List(6) { false }
                 habitStates = originalHabitStates
             }
@@ -109,128 +112,141 @@ fun DailyHabitCheckScreen(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF6F6F6))
-            .padding(horizontal = 24.dp)
     ) {
 
-        Spacer(modifier = Modifier.height(39.dp))
-
         /** ---------------------------
-         *   상단 (뒤로가기 + 제목)
+         *  본문(스크롤 영역)
         ----------------------------- */
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 24.dp)
         ) {
 
-            Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_back),
-                contentDescription = null,
-                tint = Color.Black,
-                modifier = Modifier
-                    .size(21.dp)
-                    .clickable { onBack() }
-            )
+            Spacer(modifier = Modifier.height(39.dp))
 
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center
+            /** ---------------------------
+             *   상단 (뒤로가기 + 제목)
+            ----------------------------- */
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_arrow_back),
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .size(21.dp)
+                        .clickable { onBack() }
+                )
+
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "눈 건강 습관 체크",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Spacer(modifier = Modifier.size(28.dp))
+            }
+
+            Spacer(modifier = Modifier.height(33.dp))
+
+            /** ---------------------------
+             *   수정 버튼
+            ----------------------------- */
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isEditing = true },
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_edit),
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(18.dp)
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
                 Text(
-                    text = "눈 건강 습관 체크",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = if (isEditing) "수정중" else "수정",
+                    color = if (isEditing) Color.Black else Color.Gray,
+                    fontSize = 14.sp,
+                    fontWeight = if (isEditing) FontWeight.Bold else FontWeight.Normal
                 )
             }
 
-            Spacer(modifier = Modifier.size(28.dp))
-        }
+            Spacer(modifier = Modifier.height(17.dp))
 
-        Spacer(modifier = Modifier.height(33.dp))
-
-        /** ---------------------------
-         *   수정 버튼
-        ----------------------------- */
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { isEditing = true },
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Icon(
-                painter = painterResource(id = R.drawable.ic_edit),
-                contentDescription = null,
-                tint = Color.Gray,
-                modifier = Modifier.size(18.dp)
+            /** ---------------------------
+             *   습관 리스트
+            ----------------------------- */
+            val habits = listOf(
+                Pair(R.drawable.ic_phone, "스마트폰을 장시간 이용하지 않았다"),
+                Pair(R.drawable.ic_sleep, "충분한 수면을 취했다"),
+                Pair(R.drawable.ic_nosmoking, "흡연을 하지 않았다"),
+                Pair(R.drawable.ic_eye_drop, "눈이 건조할 때 인공눈물을 넣었다"),
+                Pair(R.drawable.ic_hotpack, "눈 찜질을 하루 1회 이상 했다"),
+                Pair(R.drawable.ic_lens, "콘택트 렌즈를 장시간 사용하지 않기")
             )
 
-            Spacer(modifier = Modifier.width(4.dp))
+            habits.forEachIndexed { index, item ->
 
-            Text(
-                text = if (isEditing) "수정중" else "수정",
-                color = if (isEditing) Color.Black else Color.Gray,
-                fontSize = 14.sp,
-                fontWeight = if (isEditing) FontWeight.Bold else FontWeight.Normal
-            )
-        }
-
-        Spacer(modifier = Modifier.height(17.dp))
-
-        /** ---------------------------
-         *   습관 리스트
-        ----------------------------- */
-        val habits = listOf(
-            Pair(R.drawable.ic_phone, "스마트폰을 장시간 이용하지 않았다"),
-            Pair(R.drawable.ic_sleep, "충분한 수면을 취했다"),
-            Pair(R.drawable.ic_nosmoking, "흡연을 하지 않았다"),
-            Pair(R.drawable.ic_eye_drop, "눈이 건조할 때 인공눈물을 넣었다"),
-            Pair(R.drawable.ic_hotpack, "눈 찜질을 하루 1회 이상 했다"),
-            Pair(R.drawable.ic_lens, "콘택트 렌즈를 장시간 사용하지 않기")
-        )
-
-        habits.forEachIndexed { index, item ->
-
-            HabitItem(
-                icon = item.first,
-                text = item.second,
-                selected = habitStates[index],
-                enabled = isEditing && !loading,
-                onClick = {
-                    if (isEditing && !loading) {
-                        habitStates = habitStates.toMutableList().apply {
-                            this[index] = !this[index]
+                HabitItem(
+                    icon = item.first,
+                    text = item.second,
+                    selected = habitStates[index],
+                    enabled = isEditing && !loading,
+                    onClick = {
+                        if (isEditing && !loading) {
+                            habitStates = habitStates.toMutableList().apply {
+                                this[index] = !this[index]
+                            }
                         }
                     }
-                }
-            )
+                )
 
-            Spacer(modifier = Modifier.height(17.dp))
+                Spacer(modifier = Modifier.height(17.dp))
+            }
+
+            // 에러 메시지
+            if (errorMsg != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = errorMsg!!,
+                    color = Color.Red,
+                    fontSize = 12.sp
+                )
+            }
+
+            // 하단 고정 버튼에 가리지 않도록 아래 여백 확보
+            Spacer(modifier = Modifier.height(120.dp))
         }
-
-        // 에러 메시지
-        if (errorMsg != null) {
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = errorMsg!!,
-                color = Color.Red,
-                fontSize = 12.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(110.dp))
 
         /** ---------------------------
-         *   ✅ 체크완료 버튼 (Firestore 저장)
+         *   체크완료 버튼
         ----------------------------- */
         Box(
             modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 24.dp, vertical = 24.dp)
                 .fillMaxWidth()
                 .height(65.dp)
                 .clip(RoundedCornerShape(14.dp))
@@ -296,8 +312,6 @@ fun DailyHabitCheckScreen(
                 fontWeight = FontWeight.Bold
             )
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
     }
 
     /** ---------------------------
